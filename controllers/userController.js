@@ -12,7 +12,7 @@ const userController = {
     })
     res.status(200).send(token)
   },
-  sinup (req, res) {
+  signup (req, res) {
     const { email, password, firstName, lastName } = req.body
     if (!email || !password) {
       return res.status(400).send('email or password cannot be null!')
