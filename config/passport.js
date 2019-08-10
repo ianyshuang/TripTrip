@@ -10,8 +10,8 @@ passport.use(
   new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
     User.findOne({ email })
       .then(user => {
-        if (!user) return done(null, false, { status: 404, message: '此 email 尚未註冊！'})
-        if (!bcrypt.compareSync(password, user.password)) return done(null, false, { status: 401, message: '密碼錯誤！'})
+        if (!user) return done(null, false, 404)
+        if (!bcrypt.compareSync(password, user.password)) return done(null, false, 401)
         return done(null, user)
       })
       .catch(error => done(error))
