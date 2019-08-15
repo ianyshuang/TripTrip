@@ -17,7 +17,7 @@ const db = mongoose.connection
 const User = require('./models/user')
 
 // 使用設定
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 app.use(passport.initialize())
 app.use(cookieParser())
 
