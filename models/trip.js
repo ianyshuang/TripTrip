@@ -39,15 +39,19 @@ const tripSchema = new Schema({
    type: [Schema.Types.ObjectId],
    default: []
  },
+ collectingCounts: {
+  type: Number,
+  default: 0
+ },
  collectingUsers: {
    type: [Schema.Types.ObjectId],
    default: []
  },
- content: {
+  sites: {
    type: Schema.Types.Mixed,
    default: []
  },
- sites: {
+ content: {
    type: Schema.Types.Mixed,
    default: []
  },

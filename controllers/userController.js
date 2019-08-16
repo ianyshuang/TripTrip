@@ -10,7 +10,13 @@ const userController = {
       expires: new Date(Date.now() + 1000 * 3600 * 24),
       httpOnly: true
     })
-    res.status(200).send(token)
+    User.findById(req.user.id).select('-password').then(user => {
+      res.status(200).send(user)
+    }).catch(error => {
+      console.log(error)
+      res.status(404).end()
+    })
+    
   },
   signup (req, res) {
     const { email, password, firstName, lastName } = req.body

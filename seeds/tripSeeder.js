@@ -16,18 +16,26 @@ db.once('open', () => {
 
 User.find({}).then(users => {
   const trips = tripData.data.map(trip => {
-    const [index1, index2, index3, index4] = getRandomNonrepeatIndex()
+    const index1 = Math.floor(Math.random() * 10)
+    const index2 = Math.floor(Math.random() * 10)
+    const index3 = Math.floor(Math.random() * 10)
+    const index4 = Math.floor(Math.random() * 10)
+    const randomUsers = getRandomCollectingUsers()
     return {
       ...trip,
       userId: users[index1].id,
       comments: [
         {
+          id: users[index2].id + new Date(trip.comments[0].date).getTime(),
           date: trip.comments[0].date,
           text: trip.comments[0].text,
           userId: users[index2].id,
           userName: users[index2].firstName + ' ' + users[index2].lastName,
           replies: [
             {
+              id:
+                users[index3].id +
+                new Date(trip.comments[0].replies[0].date).getTime(),
               date: trip.comments[0].replies[0].date,
               text: trip.comments[0].replies[0].text,
               userId: users[index3].id,
@@ -37,16 +45,12 @@ User.find({}).then(users => {
           ]
         },
         {
-          date: trip.comments[0].date,
-          text: trip.comments[0].text,
+          id: users[index4].id + new Date(trip.comments[1].date).getTime(),
+          date: trip.comments[1].date,
+          text: trip.comments[1].text,
           userId: users[index4].id,
           userName: users[index4].firstName + ' ' + users[index4].lastName
         }
-      ],
-      collectingUsers: [
-        users[index2].id,
-        users[index3].id,
-        users[index4].id
       ]
     }
   })
@@ -57,10 +61,11 @@ User.find({}).then(users => {
   })
 })
 
-function getRandomNonrepeatIndex () {
+function getRandomCollectingUsers() {
+  const number = Math.floor(Math.random() * 5) + 1
   const source = Array.from(Array(10).keys())
   const result = []
-  for (let i = 0; i < 4 ; i++) {
+  for (let i = 0; i < number; i++) {
     const targetIndex = Math.floor(Math.random() * source.length)
     result.push(source[targetIndex])
     source.splice(targetIndex, 1)
