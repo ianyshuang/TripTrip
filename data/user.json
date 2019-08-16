@@ -1,0 +1,74 @@
+{
+  "data": [
+    {
+      "firstName": "andy",
+      "lastName": "wang",
+      "email": "user1@example.com",
+      "password": "user1",
+      "introduction": "hi, I am andy."
+    },
+    {
+      "firstName": "bob",
+      "lastName": "lin",
+      "email": "user2@example.com",
+      "password": "user2",
+      "introduction": "hi, I am bob."
+    },
+    {
+      "firstName": "cindy",
+      "lastName": "yang",
+      "email": "user3@example.com",
+      "password": "user3",
+      "introduction": "hi, I am cindy."
+    },
+    {
+      "firstName": "david",
+      "lastName": "chen",
+      "email": "user4@example.com",
+      "password": "user4",
+      "introduction": "hi, I am david."
+    },
+    {
+      "firstName": "erica",
+      "lastName": "chang",
+      "email": "user5@example.com",
+      "password": "user5",
+      "introduction": "hi, I am erica."
+    },
+    {
+      "firstName": "freddy",
+      "lastName": "wen",
+      "email": "user6@example.com",
+      "password": "user6",
+      "introduction": "hi, I am freddy."
+    },
+    {
+      "firstName": "gary",
+      "lastName": "wu",
+      "email": "user7@example.com",
+      "password": "user7",
+      "introduction": "hi, I am gary."
+    },
+    {
+      "firstName": "harry",
+      "lastName": "wang",
+      "email": "user8@example.com",
+      "password": "user8",
+      "introduction": "hi, I am harry."
+    },
+    {
+      "firstName": "jane",
+      "lastName": "huang",
+      "email": "user9@example.com",
+      "password": "user9",
+      "introduction": "hi, I am jane."
+    },
+    {
+      "firstName": "ketty",
+      "lastName": "li",
+      "email": "user10@example.com",
+      "password": "user10",
+      "introduction": "hi, I am ketty."
+    }
+  ]
+}
