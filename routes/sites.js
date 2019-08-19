@@ -12,8 +12,8 @@ router
   .get(authencitcated, siteController.getSite)
   .patch(authencitcated, siteController.toggleCollectingSite)
 
-router.patch('/:id/comment', authencitcated, siteController.handleComment)
+router.patch('/:id/comment', authencitcated, siteController.handleSiteComment)
 
-router.patch('/:id/:commentId/reply', authencitcated, siteController.handleReply)
+router.patch('/:id/:commentId/reply', authencitcated, siteController.handleSiteReply)
 
 module.exports = router

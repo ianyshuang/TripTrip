@@ -35,53 +35,70 @@ const siteController = {
         site.collectingUsers.push(user.id)
         user.collectedSites.push(site.id)
       }
+      site.markModified('collectingUsers')
+      user.markModified('collectedSites')
       site.save()
       user.save()
-      
       res.status(200).end()
     } catch (error) {
       console.log(error)
       res.status(500).end()
     }
   },
-  async handleComment (req, res) {
-    if (req.body.text) {
-      try {
-        const site = await Site.findById(req.params.id)
+  async handleSiteComment (req, res) {
+    const { text, commentId } = req.body
+    let message = {}
+    if (!text && !commentId) {
+      res.status(400).send('未攜帶正確資訊！')
+      return
+    }
+    try {
+      const site = await Site.findById(req.params.id)
+      if (!commentId) {
         const newComment = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
           userName: req.user.lastName + ' ' + req.user.firstName,
-          text: req.body.text
+          text: text
         }
+        message = newComment
         site.comments.push(newComment)
-        site.save()
-        res.status(200).send(newComment)
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
-      }
-    } else if (req.body.commentId) {
-      try {
-        const site = await Site.findById(req.params.id)
-        const commentIndex = site.comments.findIndex(comment => comment.id === req.body.commentId)
+      } else if (!text) {
+        const commentIndex = site.comments.findIndex(comment => comment.id === commentId)
+        if (commentIndex === -1) {
+          res.status(404).end()
+          return
+        }
         site.comments.splice(commentIndex, 1)
-        site.save()
-        res.status(200).end()
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
+      } else {
+        const comment = site.comments.find(comment => comment.id === commentId)
+        if (!comment) {
+          res.status(404).end()
+          return
+        }
+        comment.text = text
+        comment.date = new Date()
       }
-    } else {
-      res.status(400).send('未攜帶正確資訊！')
+      site.markModified('comments')
+      site.save()
+      res.status(200).send(message)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
     }
   },
-  async handleReply (req, res) {
-    if (req.body.text) {
-      try {
-        const site = await Site.findById(req.params.id)
-        const comment = site.comments.find(comment => comment.id === req.params.commentId)
+  async handleSiteReply (req, res) {
+    const { text, replyId } = req.body
+    let message = {}
+    if (!text && !replyId) {
+      res.status(404).send('未攜帶正確資訊！')
+      return
+    }
+    try {
+      const site = await Site.findById(req.params.id)
+      const comment = site.comments.find(comment => comment.id === req.params.commentId)
+      if (!replyId) {
         const newReply = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
@@ -89,37 +106,36 @@ const siteController = {
           userName: req.user.lastName + ' ' + req.user.firstName,
           text: req.body.text
         }
+        message = newReply
+        // 如果此則留言尚未有任何回覆
         if (!comment.replies) {
           comment.replies = []
         }
         comment.replies.push(newReply)
-        site.markModified('comments') // mixed type 要告訴 mongoose 是哪個屬性修改了，否則不會更新
-        site.save()
-        res.status(200).send(newReply)
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
+      } else if (!text) {
+        const replyIndex = comment.replies.findIndex(reply => reply.id === replyId)
+        if (replyIndex === -1) {
+          res.status(404).end()
+          return
+        }
+        comment.splice(replyIndex, 1)
+      } else {
+        const reply = comment.replies.find(reply => reply.id === replyId)
+        if (!reply) {
+          res.status(404).end()
+          return
+        }
+        reply.text = text
+        reply.date = new Date()
       }
-      
-    } else if (req.body.replyId) {
-      try {
-        const site = await Site.findById(req.params.id)
-        const comment = site.comments.find(comment => comment.id === req.params.commentId)
-        const replyIndex = comment.replies.findIndex(reply => reply.id === req.body.replyId)
-        comment.replies.splice(replyIndex, 1)
-        console.log(comment)
-        site.markModified('comments') // mixed type 要告訴 mongoose 是哪個屬性修改了，否則不會更新
-        site.save()
-        res.status(200).end()
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
-      }
-    } else {
-      res.status(400).send('未攜帶正確資訊！')
+      site.markModified('comments')
+      site.save()
+      res.status(200).send(message)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
     }
   }
-
 }
 
 module.exports = siteController

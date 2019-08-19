@@ -10,11 +10,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const passport = require('./config/passport')
 // 跟 mongodb 連線
-mongoose.connect('mongodb://localhost/trip-planer', { useNewUrlParser: true })
+mongoose.connect('mongodb://localhost/trip-planer', { useNewUrlParser: true, useCreateIndex: true })
 const db = mongoose.connection
-
-// 載入 Model
-const User = require('./models/user')
 
 // 使用設定
 app.use(bodyParser.json())

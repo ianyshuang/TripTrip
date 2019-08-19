@@ -2,12 +2,12 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
 const passport = require('passport')
-const User = require('../models/user')
 
 router.post('/signin', passport.authenticate('local', { session: false }), userController.signin)
 router.post('/signup', userController.signup)
 
 router.use('/sites', require('./sites'))
+router.use('/trips', require('./trips'))
 
 // router.get('/test', authencitcated, async (req, res) => {
 //   console.log(req.user)

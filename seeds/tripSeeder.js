@@ -20,7 +20,6 @@ User.find({}).then(users => {
     const index2 = Math.floor(Math.random() * 10)
     const index3 = Math.floor(Math.random() * 10)
     const index4 = Math.floor(Math.random() * 10)
-    const randomUsers = getRandomCollectingUsers()
     return {
       ...trip,
       userId: users[index1].id,
@@ -60,15 +59,3 @@ User.find({}).then(users => {
     console.log(error)
   })
 })
-
-function getRandomCollectingUsers() {
-  const number = Math.floor(Math.random() * 5) + 1
-  const source = Array.from(Array(10).keys())
-  const result = []
-  for (let i = 0; i < number; i++) {
-    const targetIndex = Math.floor(Math.random() * source.length)
-    result.push(source[targetIndex])
-    source.splice(targetIndex, 1)
-  }
-  return result
-}

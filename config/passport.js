@@ -4,7 +4,6 @@ const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const JwtStrategy = require('passport-jwt').Strategy
 
-
 passport.use(
   // 用 req.body.email 驗證
   new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {

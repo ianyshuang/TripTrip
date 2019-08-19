@@ -32,6 +32,10 @@ const userSchema = new Schema(
     collectedSites: {
       type: [Schema.Types.ObjectId],
       default: []
+    },
+    ratedTrips: {
+      type: Schema.Types.Mixed,
+      default: []
     }
   },
   { minimize: false }

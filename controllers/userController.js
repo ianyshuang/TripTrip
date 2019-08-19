@@ -16,7 +16,6 @@ const userController = {
       console.log(error)
       res.status(404).end()
     })
-    
   },
   signup (req, res) {
     const { email, password, firstName, lastName } = req.body
@@ -25,13 +24,13 @@ const userController = {
     }
     User.findOne({ email })
       .then(user => {
-        if (user) return res.status(403).send({ message: '此 email 已被註冊過!'})
+        if (user) return res.status(403).send({ message: '此 email 已被註冊過!' })
         return User.create({
           email,
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
-          firstName: firstName ? firstName : ' ',
-          lastName: lastName ? lastName : ' '
-        }).then(user => res.status(201).send({ message: '成功註冊!'}))
+          firstName: firstName || ' ',
+          lastName: lastName || ' '
+        }).then(user => res.status(201).send({ message: '成功註冊!' }))
       }).catch(error => console.log(error))
   }
 }
