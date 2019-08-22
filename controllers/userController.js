@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 
 const userController = {
   signin (req, res) {
@@ -32,6 +33,87 @@ const userController = {
           lastName: lastName || ' '
         }).then(user => res.status(201).send({ message: '成功註冊!' }))
       }).catch(error => console.log(error))
+  },
+  async getUser (req, res) {
+    try {
+      const user = await User.findById(req.params.id).select('-password ')
+      if (!user) {
+        res.status(404).end()
+        return
+      } else {
+        res.status(200).send(user)
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async issueForgotPasswordToken (req, res) {
+    const { email } = req.body
+    if (!email) {
+      res.status(400).end()
+      return
+    }
+    try {
+      const user = await User.findOne({ email })
+      if (!user) {
+        res.status(404).end()
+        return
+      } else {
+        const payload = { id: user.id }
+        const token = jwt.sign(payload, process.env.JWT_SECRET)
+        const transporter = await nodemailer.createTransport({
+          service: 'Gmail',
+          auth: {
+            user: process.env.MAIL_USER,
+            pass: process.env.MAIL_PASSWORD
+          }
+        })
+        let options = {
+          from: 'triptrip.official@gmail.com',
+          to: email,
+          subject: 'TripTrip 重設您的密碼',
+          html: `<h2>點選以下的網址來重設您的密碼</h2>
+                <a href="http://localhost:3000/users/validate_reset">重設密碼</a>
+                <p> TripTrip 管理團隊</p>`
+        }
+        transporter.sendMail(options).then(info => {
+          console.log(info.response)
+        }).catch(error => console.log(error))
+        res.cookie('forgot_password', token, {
+          expires: new Date(Date.now() + 1000 * 60 * 5),
+          httpOnly: true
+        })
+        res.status(200).end()
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async validateReset (req, res) {
+    res.status(200).end()
+  },
+  async resetPassword (req, res) {
+    const { password } = req.body
+    if (!password) {
+      res.status(400).end()
+      return
+    }
+    try {
+      const user = await User.findById(req.resetId)
+      if (!user) {
+        res.status(404).end()
+        return
+      } else {
+        user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
+        user.save()
+        res.status(200).end()
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
   }
 }
 

@@ -8,7 +8,7 @@ router.post('/signup', userController.signup)
 
 router.use('/sites', require('./sites'))
 router.use('/trips', require('./trips'))
-
+router.use('/users', require('./users'))
 // router.get('/test', authencitcated, async (req, res) => {
 //   console.log(req.user)
 //   try {
