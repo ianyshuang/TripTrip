@@ -1,22 +1,31 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+const Trip = require('../models/trip')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 
 const userController = {
-  signin (req, res) {
+  async signin (req, res) {
     const payload = { id: req.user.id }
     const token = jwt.sign(payload, process.env.JWT_SECRET)
     res.cookie('token', token, {
       expires: new Date(Date.now() + 1000 * 3600 * 24),
       httpOnly: true
     })
-    User.findById(req.user.id).select('-password').then(user => {
-      res.status(200).send(user)
-    }).catch(error => {
+    try {
+      const user = await User.findById(req.user.id).select('-password')
+      if (!user) {
+        res.status(404).end()
+      } else {
+        const data = { ...user._doc }
+        data.collectedTrips = await Trip.find({_id: { $in: data.collectedTrips }})
+        data.ownedTrips = await Trip.find({_id: { $in: data.ownedTrips }})
+        res.status(200).send(data)
+      }
+    } catch (error) {
       console.log(error)
-      res.status(404).end()
-    })
+      res.status(500).end()
+    }
   },
   signup (req, res) {
     const { email, password, firstName, lastName } = req.body
@@ -41,7 +50,10 @@ const userController = {
         res.status(404).end()
         return
       } else {
-        res.status(200).send(user)
+        const data = { ...user._doc }
+        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips }})
+        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips }})
+        res.status(200).send(data)
       }
     } catch (error) {
       console.log(error)

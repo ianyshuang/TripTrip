@@ -7,7 +7,7 @@ const authenticated = passport.authenticate('jwt', { session: false })
 const authenticate_forgot = require('../utils/verify_token')
 
 router
-  .route(':/id')
+  .route('/:id')
   .get(userController.getUser)
 
 router.post('/forgot_password', userController.issueForgotPasswordToken)

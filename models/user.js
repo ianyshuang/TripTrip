@@ -21,6 +21,10 @@ const userSchema = new Schema(
     introduction: {
       type: String
     },
+    avatar: {
+      type: Schema.Types.ObjectId,
+      default: null
+    },
     ownedTrips: {
       type: [Schema.Types.ObjectId],
       default: []

@@ -169,17 +169,17 @@ const tripController = {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
-      const userRating = user.ratedTrips.find(trip => trip.id === req.params.id)
-      if (!userRating) {
+      const userRatingObject = user.ratedTrips.find(trip => trip.id === req.params.id)
+      if (!userRatingObject) {
         trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
         trip.ratingCounts += 1
         user.ratedTrips.push({
           id: req.params.id,
-          rating: rating
+          userRating: rating
         })
       } else {
-        trip.rating = (trip.rating * trip.ratingCounts - userRating.rating + rating) / trip.ratingCounts
-        userRating.rating = rating
+        trip.rating = (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) / trip.ratingCounts
+        userRatingObject.userRating = rating
       }
       user.markModified('ratedTrips')
       user.save()
