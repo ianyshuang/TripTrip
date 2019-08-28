@@ -8,7 +8,7 @@ router.post('/signin', passport.authenticate('local', { session: false }), issue
 router.post('/signup', userController.signup)
 
 router.use('/facebook', require('./facebook'))
-
+router.use('/google', require('./google'))
 router.use('/sites', require('./sites'))
 router.use('/trips', require('./trips'))
 router.use('/users', require('./users'))
