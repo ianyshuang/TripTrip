@@ -6,12 +6,6 @@ const nodemailer = require('nodemailer')
 
 const userController = {
   async signin (req, res) {
-    const payload = { id: req.user.id }
-    const token = jwt.sign(payload, process.env.JWT_SECRET)
-    res.cookie('token', token, {
-      expires: new Date(Date.now() + 1000 * 3600 * 24),
-      httpOnly: true
-    })
     try {
       const user = await User.findById(req.user.id).select('-password')
       if (!user) {

@@ -2,29 +2,15 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
 const passport = require('passport')
+const issueToken = require('../utils/issue_token')
 
-router.post('/signin', passport.authenticate('local', { session: false }), userController.signin)
+router.post('/signin', passport.authenticate('local', { session: false }), issueToken, userController.signin)
 router.post('/signup', userController.signup)
+
+router.use('/facebook', require('./facebook'))
 
 router.use('/sites', require('./sites'))
 router.use('/trips', require('./trips'))
 router.use('/users', require('./users'))
-// router.get('/test', authencitcated, async (req, res) => {
-//   console.log(req.user)
-//   try {
-//     const user = await User.create({
-//       firstName: 'ian',
-//       lastName: 'huang',
-//       email: 'ianyshuang@gmail.com',
-//       password: '1234',
-//       introduction: 'hi, 我叫翌軒！',
-//     })
-//     console.log(user)
-//     res.status(200).send('success!')
-//   } catch (error) {
-//     console.log(error)
-//     res.status(500).send('something wrong...')
-//   }
-// })
 
 module.exports = router
