@@ -2,24 +2,24 @@ const Site = require('../models/site')
 const User = require('../models/user')
 
 const siteController = {
-  getPopularSites (req, res) {
-    Site.find({}).sort({
-      collectingCounts: 'desc'
-    }).then(sites => {
+  async getPopularSites (req, res) {
+    try {
+      const sites = await Site.find({}).sort({ collectingCounts: -1 })
       const popularSites = sites.slice(0, 4)
       res.status(200).send(popularSites)
-    }).catch(error => {
+    } catch (error) {
       console.log(error)
-      res.status(404).end()
-    })
+      res.status(500).end()
+    }
   },
-  getSite (req, res) {
-    Site.findById(req.params.id).then(site => {
+  async getSite (req, res) {
+    try {
+      const site = await Site.findById(req.params.id)
       res.status(200).send(site)
-    }).catch(error => {
+    } catch (error) {
       console.log(error)
       res.status(404).end()
-    })
+    }
   },
   async toggleCollectingSite (req, res) {
     try {

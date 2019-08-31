@@ -10,6 +10,7 @@ router
   .get(tripController.getTrips)
   .post(authenticated, tripController.createTrip)
 
+router.get('/search', tripController.getTripByKeyword)
 router.get('/popular', tripController.getPopularTrips)
 
 router

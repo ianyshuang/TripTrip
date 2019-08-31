@@ -1,5 +1,7 @@
 const Trip = require('../models/trip')
 const User = require('../models/user')
+const MongoClient = require('mongodb').MongoClient
+const assert = require('assert')
 
 const tripController = {
   async getPopularTrips (req, res) {
@@ -62,6 +64,28 @@ const tripController = {
     } catch (error) {
       console.log(error)
       res.status(404).end()
+    }
+  },
+  async getTripByKeyword (req, res) {
+    const { keyword } = req.query
+    const regex = new RegExp(keyword, 'i')
+    try {
+      const client = await MongoClient.connect('mongodb://localhost', { useNewUrlParser: true, useUnifiedTopology: true })
+      const db = client.db('trip-planer')
+      const trips = await db.collection('trips').find({
+        $or: [
+          { name: { $regex: regex } },
+          { journal: { $regex: regex } },
+          { sites: { $elemMatch: { $elemMatch: { $in: [regex] } } } },
+          { country: keyword },
+          { cities: keyword }
+        ]
+      }).sort({ rating: -1 }).toArray()
+      res.status(200).send(trips)
+      client.close()
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
     }
   },
   async createTrip (req, res) {
