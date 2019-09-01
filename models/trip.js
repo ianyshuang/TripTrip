@@ -44,7 +44,7 @@ const tripSchema = new Schema({
     default: 0
   },
   images: {
-    type: [Schema.Types.ObjectId],
+    type: [String],
     default: []
   },
   collectingCounts: {

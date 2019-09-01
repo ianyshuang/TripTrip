@@ -3,6 +3,7 @@ const User = require('../models/user')
 const Trip = require('../models/trip')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const imgur = require('imgur')
 
 const userController = {
   async signin (req, res) {
@@ -21,21 +22,29 @@ const userController = {
       res.status(500).end()
     }
   },
-  signup (req, res) {
+  async signup (req, res) {
     const { email, password, firstName, lastName } = req.body
     if (!email || !password) {
-      return res.status(400).send('email or password cannot be null!')
+      res.status(400).send('email 或 密碼不能為空！')
+      return
     }
-    User.findOne({ email })
-      .then(user => {
-        if (user) return res.status(403).send({ message: '此 email 已被註冊過!' })
-        return User.create({
+    try {
+      const user = await User.findOne({ email })
+      if (user) {
+        res.status(403).send({ message: '此 email 已被註冊過！' })
+      } else {
+        const newUser = User.create({
           email,
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
           firstName: firstName || ' ',
           lastName: lastName || ' '
-        }).then(user => res.status(201).send({ message: '成功註冊!' }))
-      }).catch(error => console.log(error))
+        })
+        res.status(201).send(newUser)
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).send()
+    }
   },
   async getUser (req, res) {
     try {
@@ -49,6 +58,35 @@ const userController = {
         data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips }})
         res.status(200).send(data)
       }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async editProfile (req, res) {
+    const text = JSON.parse(JSON.stringify(req.body))
+    const file = req.file
+    const { firstName, lastName, password, introduction } = text
+    let imgurObject = null
+    if (file) {
+      try {
+        imgur.setClientId(process.env.IMGUR_ID)
+        imgurObject = await imgur.uploadFile(file.path)
+      } catch (error) {
+        console.log(error)
+        res.status(500).end()
+        return
+      }
+    }
+    try {
+      const user = await User.findById(req.user.id)
+      user.firstName = firstName ? firstName : user.firstName
+      user.lastName = lastName ? lastName : user.lastName
+      user.password = password ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null) : user.password
+      user.introduction = introduction ? introduction : user.introduction
+      user.avatar = file ? imgurObject.data.link : user.avatar
+      user.save()
+      res.status(200).send(user)
     } catch (error) {
       console.log(error)
       res.status(500).end()
