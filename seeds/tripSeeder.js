@@ -2,8 +2,9 @@ const mongoose = require('mongoose')
 const User = require('../models/user')
 const Trip = require('../models/trip')
 const tripData = require('../data/trip.json')
+const dbpath = process.env.MONGODB_URI || 'mongodb://localhost/trip-planer'
 
-mongoose.connect('mongodb://localhost/trip-planer', { useNewUrlParser: true })
+mongoose.connect(dbpath, { useNewUrlParser: true })
 
 const db = mongoose.connection
 db.on('error', () => {

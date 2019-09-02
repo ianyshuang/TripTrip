@@ -1,7 +1,16 @@
 const Trip = require('../models/trip')
 const User = require('../models/user')
 const MongoClient = require('mongodb').MongoClient
-const assert = require('assert')
+const imgur = require('imgur')
+
+async function uploadImages(paths) {
+  const imgLinks = []
+  for (const path of paths) {
+    const result = await imgur.uploadFile(path)
+    imgLinks.push(result.data.link)
+  }
+  return imgLinks
+}
 
 const tripController = {
   async getPopularTrips (req, res) {
@@ -89,21 +98,30 @@ const tripController = {
     }
   },
   async createTrip (req, res) {
-    const data = req.body
-    if (!data.name || !data.days || !data.country || !data.cities || !data.startDate || !data.isPrivate || !data.journal || !data.content || !data.sites) {
-      res.status(400).send('缺少必要的行程資訊！')
-      return
-    }
-    try {
-      const trip = await Trip.create({
-        ...data,
-        userId: req.user.id,
-        startDate: new Date(data.startDate)
-      })
-      res.status(200).send(trip)
-    } catch (error) {
-      console.log(error)
-      res.status(500).end()
+    const data = JSON.parse(JSON.stringify(req.body))
+    const files = req.files
+    data.days = parseInt(data.days)
+    data.isPrivate = (data.isPrivate === 'true')
+    // if (!data.name || !data.days || !data.country || !data.cities || !data.startDate || !data.isPrivate || !data.journal || !data.content || !data.sites) {
+    //   res.status(400).send('缺少必要的行程資訊！')
+    //   return
+    // }
+    if (files.length !== 0) {
+      try {
+        imgur.setClientId(process.env.IMGUR_ID)
+        const filePaths = files.map(file => file.path)
+        const imgLinks = await uploadImages(filePaths)
+        const trip = await Trip.create({
+          userId: req.user.id,
+          ...data,
+          images: imgLinks,
+          startDate: new Date(data.startDate)
+        })
+        res.status(200).send(trip)
+      } catch (error) {
+        console.log(error)
+        res.status(500).end()
+      }
     }
   },
   async updateTrip (req, res) {

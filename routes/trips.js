@@ -2,13 +2,15 @@ const express = require('express')
 const router = express.Router()
 const passport = require('../config/passport')
 const tripController = require('../controllers/tripController')
+const multer = require('multer')
+const upload = multer({ dest: 'temp/' })
 
 const authenticated = passport.authenticate('jwt', { session: false })
 
 router
   .route('/')
   .get(tripController.getTrips)
-  .post(authenticated, tripController.createTrip)
+  .post(authenticated, upload.array('images'), tripController.createTrip)
 
 router.get('/search', tripController.getTripByKeyword)
 router.get('/popular', tripController.getPopularTrips)

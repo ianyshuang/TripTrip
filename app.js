@@ -1,16 +1,17 @@
 // 載入套件及初始設定
 const express = require('express')
 const app = express()
-const port = process.env.PORT || 3000
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const port = process.env.PORT || 3000
+const dbpath = process.env.MONGODB_URI || 'mongodb://localhost/trip-planer'
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 const passport = require('./config/passport')
 // 跟 mongodb 連線
-mongoose.connect('mongodb://localhost/trip-planer', { useNewUrlParser: true, useCreateIndex: true })
+mongoose.connect(dbpath, { useNewUrlParser: true, useCreateIndex: true })
 const db = mongoose.connection
 
 // 使用設定
