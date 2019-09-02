@@ -33,60 +33,82 @@ passport.use(
 )
 
 passport.use(
-  new FacebookStrategy({
-    clientID: process.env.FACEBOOK_ID,
-    clientSecret: process.env.FACEBOOK_SECRET,
-    callbackURL: 'http://localhost:3000/facebook/redirect',
-    profileFields: ['email', 'displayName', 'picture.type(large)']
-  }, async (accessToken, refreshToken, profile, done) => {
-    try {
-      const user = await User.findOne({ email: profile._json.email })
-      if (user) {
-        return done(null, user)
-      } else {
-        var randomPassword = Math.random().toString(36).slice(-8)
-        const newUser = await User.create({
-          firstName: profile.name.givenName ? profile.name.givenName : profile.displayName,
-          lastName: profile.name.familyName ? profile.name.familyName : ' ',
-          email: profile._json.email,
-          password: bcrypt.hashSync(randomPassword, bcrypt.genSaltSync(10), null),
-          avatar: profile.photos[0].value ? profile.photos[0].value : null
-        })
-        return done(null, newUser)
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_ID,
+      clientSecret: process.env.FACEBOOK_SECRET,
+      callbackURL: 'https://triptrip-backend.herokuapp.com/facebook/redirect',
+      profileFields: ['email', 'displayName', 'picture.type(large)']
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const user = await User.findOne({ email: profile._json.email })
+        if (user) {
+          return done(null, user)
+        } else {
+          var randomPassword = Math.random()
+            .toString(36)
+            .slice(-8)
+          const newUser = await User.create({
+            firstName: profile.name.givenName
+              ? profile.name.givenName
+              : profile.displayName,
+            lastName: profile.name.familyName ? profile.name.familyName : ' ',
+            email: profile._json.email,
+            password: bcrypt.hashSync(
+              randomPassword,
+              bcrypt.genSaltSync(10),
+              null
+            ),
+            avatar: profile.photos[0].value ? profile.photos[0].value : null
+          })
+          return done(null, newUser)
+        }
+      } catch (error) {
+        console.log(error)
+        return done(error)
       }
-    } catch (error) {
-      console.log(error)
-      return done(error)
     }
-  })
+  )
 )
 
 passport.use(
-  new GoogleStrategy({
-    clientID: process.env.GOOGLE_ID,
-    clientSecret: process.env.GOOGLE_SECRET,
-    callbackURL: 'http://localhost:3000/google/redirect'
-  }, async (accessToken, refreshToken, profile, done) => {
-    try {
-      const user = await User.findOne({ email: profile._json.email })
-      if (user) {
-        return done(null, user)
-      } else {
-        var randomPassword = Math.random().toString(36).slice(-8)
-        const newUser = await User.create({
-          firstName: profile.name.givenName ? profile.name.givenName : profile.displayName,
-          lastName: profile.name.familyName ? profile.name.familyName : ' ',
-          email: profile._json.email,
-          password: bcrypt.hashSync(randomPassword, bcrypt.genSaltSync(10), null),
-          avatar: profile.picture ? profile.picture : null
-        })
-        return done(null, newUser)
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      callbackURL: 'https://triptrip-backend.herokuapp.com/google/redirect'
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const user = await User.findOne({ email: profile._json.email })
+        if (user) {
+          return done(null, user)
+        } else {
+          var randomPassword = Math.random()
+            .toString(36)
+            .slice(-8)
+          const newUser = await User.create({
+            firstName: profile.name.givenName
+              ? profile.name.givenName
+              : profile.displayName,
+            lastName: profile.name.familyName ? profile.name.familyName : ' ',
+            email: profile._json.email,
+            password: bcrypt.hashSync(
+              randomPassword,
+              bcrypt.genSaltSync(10),
+              null
+            ),
+            avatar: profile.picture ? profile.picture : null
+          })
+          return done(null, newUser)
+        }
+      } catch (error) {
+        console.log(error)
+        return done(error)
       }
-    } catch (error) {
-      console.log(error)
-      return done(error)
     }
-  })
+  )
 )
 
 module.exports = passport
