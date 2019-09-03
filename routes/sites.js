@@ -5,11 +5,11 @@ const passport = require('passport')
 
 const authencitcated = passport.authenticate('jwt', { session: false })
 
-router.get('/popular', authencitcated, siteController.getPopularSites)
+router.get('/popular', siteController.getPopularSites)
 
 router
   .route('/:id')
-  .get(authencitcated, siteController.getSite)
+  .get(siteController.getSite)
   .patch(authencitcated, siteController.toggleCollectingSite)
 
 router.patch('/:id/comment', authencitcated, siteController.handleSiteComment)
