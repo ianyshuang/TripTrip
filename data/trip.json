@@ -8,7 +8,7 @@
       "startDate": "2019-01-01",
       "isPrivate": false,
       "journal": "此趟行程包括花蓮、台東最值得造訪的景點，你能夠到山上享受清新空氣、看到大片金黃的金針花海，也能夠到七星潭、三仙台看到蔚藍的海洋，除此之外，還有刺激的泛舟、令人垂涎的當地美食、私房景點等著你！",
-      "content": [
+      "contents": [
         {
           "activities": [
             {
@@ -91,7 +91,7 @@
       "startDate": "2019-05-05",
       "isPrivate": false,
       "journal": "用一天帶你造訪台北的某些知名景點～",
-      "content": [
+      "contents": [
         {
           "activities": [
             {
@@ -146,7 +146,7 @@
       "startDate": "2019-07-20",
       "isPrivate": true,
       "journal": "造訪台灣歷史最悠久的都市，並享受這城市的慢活氣氛跟絕佳美食！",
-      "content": [
+      "contents": [
         {
           "activities": [
             {
@@ -225,7 +225,7 @@
       "startDate": "2019-04-10",
       "isPrivate": true,
       "journal": "台北的後花園，有著明媚風光及舒服的溫泉",
-      "content": [
+      "contents": [
         {
           "activities": [
             {
@@ -318,7 +318,7 @@
         "startDate": "2019-10-10",
         "isPrivate": false,
         "journal": "台灣中部最繁榮的城市，市區以外也有許多不錯的景點",
-        "content": [
+        "contents": [
           {
             "activities": [
               {

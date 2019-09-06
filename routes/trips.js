@@ -9,7 +9,7 @@ const authenticated = passport.authenticate('jwt', { session: false })
 
 router
   .route('/')
-  .get(tripController.getTrips)
+  .get(tripController.getTripByCountryAndCities)
   .post(authenticated, upload.array('images'), tripController.createTrip)
 
 router.get('/search', tripController.getTripByKeyword)

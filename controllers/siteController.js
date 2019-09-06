@@ -59,7 +59,8 @@ const siteController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.lastName + ' ' + req.user.firstName,
+          userName: req.user.name,
+          userAvatar: req.user.avatar,
           text: text
         }
         message = newComment
@@ -103,7 +104,8 @@ const siteController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.lastName + ' ' + req.user.firstName,
+          userName: req.user.name,
+          userAvatar: req.user.avatar,
           text: req.body.text
         }
         message = newReply

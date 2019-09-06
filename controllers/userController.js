@@ -23,9 +23,9 @@ const userController = {
     }
   },
   async signup (req, res) {
-    const { email, password, firstName, lastName } = req.body
-    if (!email || !password) {
-      res.status(400).send('email 或 密碼不能為空！')
+    const { email, password, name } = req.body
+    if (!email || !password || !name) {
+      res.status(400).send('請填入所有資訊！')
       return
     }
     try {
@@ -36,8 +36,7 @@ const userController = {
         const newUser = User.create({
           email,
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
-          firstName: firstName || ' ',
-          lastName: lastName || ' '
+          name,
         })
         res.status(201).send(newUser)
       }
@@ -47,6 +46,15 @@ const userController = {
     }
   },
   async getUser (req, res) {
+    try {
+      const user = await User.findById(req.user.id)
+      res.status(200).send(user)
+    } catch (error) {
+      console.log(error)
+      res.status(500)
+    }
+  },
+  async getUserById (req, res) {
     try {
       const user = await User.findById(req.params.id).select('-password ')
       if (!user) {
@@ -66,7 +74,7 @@ const userController = {
   async editProfile (req, res) {
     const text = JSON.parse(JSON.stringify(req.body))
     const file = req.file
-    const { firstName, lastName, password, introduction } = text
+    const { name , password, introduction } = text
     let imgurObject = null
     if (file) {
       try {
@@ -80,8 +88,7 @@ const userController = {
     }
     try {
       const user = await User.findById(req.user.id)
-      user.firstName = firstName ? firstName : user.firstName
-      user.lastName = lastName ? lastName : user.lastName
+      user.name = name ? name : user.name
       user.password = password ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null) : user.password
       user.introduction = introduction ? introduction : user.introduction
       user.avatar = file ? imgurObject.data.link : user.avatar
@@ -113,12 +120,13 @@ const userController = {
             pass: process.env.MAIL_PASSWORD
           }
         })
+        const randomCode = Math.random().toString(36).slice(-20)
         let options = {
           from: 'triptrip.official@gmail.com',
           to: email,
           subject: 'TripTrip 重設您的密碼',
           html: `<h2>點選以下的網址來重設您的密碼</h2>
-                <a href="http://localhost:3000/users/validate_reset">重設密碼</a>
+                <a href="https://triptrip-backend.herokuapp.com/users/validate_reset/${randomCode}">重設密碼</a>
                 <p> TripTrip 管理團隊</p>`
         }
         transporter.sendMail(options).then(info => {

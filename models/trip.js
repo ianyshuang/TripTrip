@@ -13,7 +13,7 @@ const tripSchema = new Schema({
   },
   days: {
     type: Number,
-    required: true
+    default: 1
   },
   country: {
     type: String,
@@ -24,8 +24,7 @@ const tripSchema = new Schema({
     default: []
   },
   startDate: {
-    type: Date,
-    required: true
+    type: Date
   },
   isPrivate: {
     type: Boolean,
@@ -59,7 +58,7 @@ const tripSchema = new Schema({
     type: Schema.Types.Mixed,
     default: []
   },
-  content: {
+  contents: {
     type: Schema.Types.Mixed,
     default: []
   },

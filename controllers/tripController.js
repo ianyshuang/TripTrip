@@ -13,7 +13,7 @@ async function uploadImages(paths) {
 }
 
 const tripController = {
-  async getPopularTrips (req, res) {
+  async getPopularTrips(req, res) {
     try {
       const trips = await Trip.find({}).sort({ collectingCounts: 'desc' })
       const popularTrips = trips.slice(0, 4)
@@ -23,50 +23,7 @@ const tripController = {
       res.status(404).end()
     }
   },
-  async getTrips (req, res) {
-    let { country, cities } = req.query
-    // query string preprocessing
-    if (country === '台灣') {
-      country = '臺灣'
-    }
-    if (!cities) {
-      cities = []
-    } else {
-      cities = JSON.parse(cities)
-    }
-    // 根據 query string 進行搜尋及回傳
-    if (!country) {
-      res.status(400).send('未填入欲選取的行程國家！')
-      return
-    }
-    if (cities.length === 0) {
-      try {
-        const trips = await Trip.find({ country })
-        res.status(200).send(trips)
-      } catch (error) {
-        console.log(error)
-        res.status(404).end()
-      }
-    } else {
-      try {
-        const trips = await Trip.find({ country: country })
-        const selectedTrips = trips.filter(trip => {
-          let includeCity = false
-          cities.forEach(city => {
-            if (trip.cities.includes(city)) {
-              includeCity = true
-            }
-          })
-          return includeCity
-        })
-        res.status(200).send(selectedTrips)
-      } catch (error) {
-        console.log(error)
-        res.status(404).ends()
-      }
-    }
-  },
-  async getTrip (req, res) {
+  async getTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       res.status(200).send(trip)
@@ -75,21 +32,60 @@ const tripController = {
       res.status(404).end()
     }
   },
-  async getTripByKeyword (req, res) {
+  async getTripByCountryAndCities(req, res) {
+    let { cities, country } = req.query
+    if (cities) {
+      try {
+        const trips = await Trip.find({
+          cities: { $in: cities }
+        })
+        res.status(200).send(trips)
+      } catch (error) {
+        console.log(error)
+        res.status(500).end()
+      }
+    } else if (country) {
+      try {
+        const trips = await Trip.find({
+          country: country
+        })
+        res.status(200).send(trips)
+      } catch (error) {
+        console.log(error)
+        res.status(500).end()
+      }
+    } else {
+      try {
+        const trips = await Trip.find({})
+        res.status(200).send(trips)
+      } catch (error) {
+        console.log(error)
+        res.status(500).end()
+      }
+    }
+  },
+  async getTripByKeyword(req, res) {
     const { keyword } = req.query
     const regex = new RegExp(keyword, 'i')
     try {
-      const client = await MongoClient.connect('mongodb://localhost', { useNewUrlParser: true, useUnifiedTopology: true })
+      const client = await MongoClient.connect('mongodb://localhost', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
       const db = client.db('trip-planer')
-      const trips = await db.collection('trips').find({
-        $or: [
-          { name: { $regex: regex } },
-          { journal: { $regex: regex } },
-          { sites: { $elemMatch: { $elemMatch: { $in: [regex] } } } },
-          { country: keyword },
-          { cities: keyword }
-        ]
-      }).sort({ rating: -1 }).toArray()
+      const trips = await db
+        .collection('trips')
+        .find({
+          $or: [
+            { name: { $regex: regex } },
+            { journal: { $regex: regex } },
+            { sites: { $elemMatch: { $elemMatch: { $in: [regex] } } } },
+            { country: keyword },
+            { cities: keyword }
+          ]
+        })
+        .sort({ rating: -1 })
+        .toArray()
       res.status(200).send(trips)
       client.close()
     } catch (error) {
@@ -97,12 +93,12 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async createTrip (req, res) {
+  async createTrip(req, res) {
     const data = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     data.days = parseInt(data.days)
-    data.isPrivate = (data.isPrivate === 'true')
-    // if (!data.name || !data.days || !data.country || !data.cities || !data.startDate || !data.isPrivate || !data.journal || !data.content || !data.sites) {
+    data.isPrivate = data.isPrivate === 'true'
+    // if (!data.name || !data.days || !data.country || !data.cities || !data.startDate || !data.isPrivate || !data.journal || !data.contents || !data.sites) {
     //   res.status(400).send('缺少必要的行程資訊！')
     //   return
     // }
@@ -124,12 +120,12 @@ const tripController = {
       }
     }
   },
-  async updateTrip (req, res) {
+  async updateTrip(req, res) {
     const data = req.body
     try {
       let trip = await Trip.findById(req.params.id)
       trip = Object.assign(trip, data)
-      trip.markModified('content')
+      trip.markModified('contents')
       trip.markModified('sites')
       trip.markModified('comments')
       trip.save()
@@ -139,7 +135,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async deleteTrip (req, res) {
+  async deleteTrip(req, res) {
     try {
       const trip = await Trip.findByIdAndDelete(req.params.id)
       if (!trip) {
@@ -152,15 +148,19 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async toggleCollectingTrip (req, res) {
+  async toggleCollectingTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
       if (trip.collectingUsers.includes(req.user.id)) {
-        const userIdIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
+        const userIdIndex = trip.collectingUsers.findIndex(
+          id => id === req.user.id
+        )
         trip.collectingUsers.splice(userIdIndex, 1)
         trip.collectingCounts -= 1
-        const tripIdIndex = user.collectedTrips.findIndex(id => id === req.params.id)
+        const tripIdIndex = user.collectedTrips.findIndex(
+          id => id === req.params.id
+        )
         user.collectedTrips.splice(tripIdIndex, 1)
       } else {
         trip.collectingUsers.push(req.user.id)
@@ -177,14 +177,14 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async forkTrip (req, res) {
+  async forkTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       if (!trip) {
         res.status(404).end()
         return
       }
-      const { name, days, country, cities, startDate, content, sites } = trip
+      const { name, days, country, cities, startDate, contents, sites } = trip
       const newTrip = await Trip.create({
         userId: req.user.id,
         isPrivate: false,
@@ -193,7 +193,7 @@ const tripController = {
         country,
         cities,
         startDate,
-        content,
+        contents,
         sites
       })
       res.status(200).send(newTrip)
@@ -202,7 +202,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async rateTrip (req, res) {
+  async rateTrip(req, res) {
     const { rating } = req.body
     if (!rating) {
       res.status(400).send('未傳送評分！')
@@ -211,16 +211,21 @@ const tripController = {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
-      const userRatingObject = user.ratedTrips.find(trip => trip.id === req.params.id)
+      const userRatingObject = user.ratedTrips.find(
+        trip => trip.id === req.params.id
+      )
       if (!userRatingObject) {
-        trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
+        trip.rating =
+          (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
         trip.ratingCounts += 1
         user.ratedTrips.push({
           id: req.params.id,
           userRating: rating
         })
       } else {
-        trip.rating = (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) / trip.ratingCounts
+        trip.rating =
+          (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) /
+          trip.ratingCounts
         userRatingObject.userRating = rating
       }
       user.markModified('ratedTrips')
@@ -232,7 +237,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async handleTripComment (req, res) {
+  async handleTripComment(req, res) {
     const { text, commentId } = req.body
     let message = {}
     if (!text && !commentId) {
@@ -246,7 +251,8 @@ const tripController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.lastName + ' ' + req.user.firstName,
+          userName: req.user.name,
+          userAvatar: req.user.avatar,
           text: text
         }
         message = newComment
@@ -275,7 +281,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async handleTripReply (req, res) {
+  async handleTripReply(req, res) {
     const { text, replyId } = req.body
     let message = {}
     if (!text && !replyId) {
@@ -290,7 +296,8 @@ const tripController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.lastName + ' ' + req.user.firstName,
+          userName: req.user.name,
+          userAvatar: req.user.avatar,
           text: req.body.text
         }
         message = newReply

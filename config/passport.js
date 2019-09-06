@@ -50,10 +50,7 @@ passport.use(
             .toString(36)
             .slice(-8)
           const newUser = await User.create({
-            firstName: profile.name.givenName
-              ? profile.name.givenName
-              : profile.displayName,
-            lastName: profile.name.familyName ? profile.name.familyName : ' ',
+            name: profile.displayName ? profile.displayName : ' ',
             email: profile._json.email,
             password: bcrypt.hashSync(
               randomPassword,
@@ -89,10 +86,7 @@ passport.use(
             .toString(36)
             .slice(-8)
           const newUser = await User.create({
-            firstName: profile.name.givenName
-              ? profile.name.givenName
-              : profile.displayName,
-            lastName: profile.name.familyName ? profile.name.familyName : ' ',
+            name: profile.displayName ? profile.displayName : ' ',
             email: profile._json.email,
             password: bcrypt.hashSync(
               randomPassword,
