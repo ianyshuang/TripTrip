@@ -59,7 +59,7 @@ const siteController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.name,
+          userName: req.user.username,
           userAvatar: req.user.avatar,
           text: text
         }
@@ -104,7 +104,7 @@ const siteController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.name,
+          userName: req.user.username,
           userAvatar: req.user.avatar,
           text: req.body.text
         }

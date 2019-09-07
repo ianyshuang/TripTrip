@@ -27,7 +27,7 @@ User.find({}).then(users => {
           id: users[index1].id + new Date(site.comments[0].date).getTime(),
           date: site.comments[0].date,
           userId: users[index1].id,
-          userName: users[index1].name,
+          userName: users[index1].username,
           text: site.comments[0].text,
           replies: [
             {
@@ -35,7 +35,7 @@ User.find({}).then(users => {
               date: site.comments[0].replies[0].date,
               userId: users[index2].id,
               userName:
-                users[index2].name,
+                users[index2].username,
               text: site.comments[0].replies[0].text
             }
           ]
@@ -44,7 +44,7 @@ User.find({}).then(users => {
           id: users[index3].id + new Date(site.comments[1].date).getTime(),
           date: site.comments[1].date,
           userId: users[index3].id,
-          userName: users[index3].name,
+          userName: users[index3].username,
           text: site.comments[1].text
         }
       ]

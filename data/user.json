@@ -1,61 +1,61 @@
 {
   "data": [
     {
-      "name": "andy",
+      "username": "andy",
       "email": "user1@example.com",
       "password": "user1",
       "introduction": "hi, I am andy."
     },
     {
-      "name": "bob",
+      "username": "bob",
       "email": "user2@example.com",
       "password": "user2",
       "introduction": "hi, I am bob."
     },
     {
-      "name": "cindy",
+      "username": "cindy",
       "email": "user3@example.com",
       "password": "user3",
       "introduction": "hi, I am cindy."
     },
     {
-      "name": "david",
+      "username": "david",
       "email": "user4@example.com",
       "password": "user4",
       "introduction": "hi, I am david."
     },
     {
-      "name": "erica",
+      "username": "erica",
       "email": "user5@example.com",
       "password": "user5",
       "introduction": "hi, I am erica."
     },
     {
-      "name": "freddy",
+      "username": "freddy",
       "email": "user6@example.com",
       "password": "user6",
       "introduction": "hi, I am freddy."
     },
     {
-      "name": "gary",
+      "username": "gary",
       "email": "user7@example.com",
       "password": "user7",
       "introduction": "hi, I am gary."
     },
     {
-      "name": "harry",
+      "username": "harry",
       "email": "user8@example.com",
       "password": "user8",
       "introduction": "hi, I am harry."
     },
     {
-      "name": "jane",
+      "username": "jane",
       "email": "user9@example.com",
       "password": "user9",
       "introduction": "hi, I am jane."
     },
     {
-      "name": "ketty",
+      "username": "ketty",
       "email": "user10@example.com",
       "password": "user10",
       "introduction": "hi, I am ketty."

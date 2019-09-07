@@ -23,8 +23,8 @@ const userController = {
     }
   },
   async signup (req, res) {
-    const { email, password, name } = req.body
-    if (!email || !password || !name) {
+    const { email, password, username } = req.body
+    if (!email || !password || !username) {
       res.status(400).send('請填入所有資訊！')
       return
     }
@@ -36,7 +36,7 @@ const userController = {
         const newUser = User.create({
           email,
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
-          name,
+          username,
         })
         res.status(201).send(newUser)
       }
@@ -74,7 +74,7 @@ const userController = {
   async editProfile (req, res) {
     const text = JSON.parse(JSON.stringify(req.body))
     const file = req.file
-    const { name , password, introduction } = text
+    const { username , password, introduction } = text
     let imgurObject = null
     if (file) {
       try {
@@ -88,7 +88,7 @@ const userController = {
     }
     try {
       const user = await User.findById(req.user.id)
-      user.name = name ? name : user.name
+      user.username = username ? username : user.username
       user.password = password ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null) : user.password
       user.introduction = introduction ? introduction : user.introduction
       user.avatar = file ? imgurObject.data.link : user.avatar

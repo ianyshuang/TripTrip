@@ -32,12 +32,22 @@ passport.use(
   })
 )
 
+let facebookCallback = ''
+let googleCallback = ''
+if (process.env.NODE_ENV === 'production') {
+  facebookCallback = 'https://triptrip-backend.herokuapp.com/facebook/redirect'
+  googleCallback = 'https://triptrip-backend.herokuapp.com/google/redirect'
+} else {
+  facebookCallback = 'http://localhost:3000/facebook/redirect'
+  googleCallback = 'http://localhost:3000/google/redirect'
+}
+
 passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_ID,
       clientSecret: process.env.FACEBOOK_SECRET,
-      callbackURL: 'https://triptrip-backend.herokuapp.com/facebook/redirect',
+      callbackURL: facebookCallback,
       profileFields: ['email', 'displayName', 'picture.type(large)']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -50,7 +60,7 @@ passport.use(
             .toString(36)
             .slice(-8)
           const newUser = await User.create({
-            name: profile.displayName ? profile.displayName : ' ',
+            username: profile.displayName ? profile.displayName : ' ',
             email: profile._json.email,
             password: bcrypt.hashSync(
               randomPassword,
@@ -74,7 +84,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: 'https://triptrip-backend.herokuapp.com/google/redirect'
+      callbackURL: googleCallback
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -86,7 +96,7 @@ passport.use(
             .toString(36)
             .slice(-8)
           const newUser = await User.create({
-            name: profile.displayName ? profile.displayName : ' ',
+            username: profile.displayName ? profile.displayName : ' ',
             email: profile._json.email,
             password: bcrypt.hashSync(
               randomPassword,
