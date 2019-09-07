@@ -1,8 +1,24 @@
 const Site = require('../models/site')
 const User = require('../models/user')
+const Trip = require('../models/trip')
+const MongoClient = require('mongodb').MongoClient
+const dbpath = process.env.MONGODB_URI || 'mongodb://localhost'
 
 const siteController = {
-  async getPopularSites (req, res) {
+  async getSitesByKeyword(req, res) {
+    const { keyword } = req.query
+    const regex = new RegExp(keyword, 'i')
+    try {
+      const sites = await Site.find({
+        name: { $regex: regex }
+      }).sort({ collectingCounts: -1 })
+      res.status(200).send(sites)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async getPopularSites(req, res) {
     try {
       const sites = await Site.find({}).sort({ collectingCounts: -1 })
       const popularSites = sites.slice(0, 4)
@@ -12,13 +28,30 @@ const siteController = {
       res.status(500).end()
     }
   },
-  async getSite (req, res) {
+  async getSite(req, res) {
     try {
-      const site = await Site.findById(req.params.id)
-      res.status(200).send(site)
+      const site = await Site.findOne({ placeId: req.params.id })
+      if (!site) {
+        res.status(404).end()
+        return
+      }
+      const client = await MongoClient.connect(dbpath, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
+      const db = client.db('trip-planer')
+      const trips = await db
+        .collection('trips')
+        .find({
+          sites: { $elemMatch: { $elemMatch: { $in: [site.name] } } }
+        })
+        .sort({ collectingCounts: -1 })
+        .toArray()
+      res.status(200).send({ site, trips })
+      client.close()
     } catch (error) {
       console.log(error)
-      res.status(404).end()
+      res.status(500).end()
     }
   },
   async toggleCollectingSite (req, res) {
@@ -40,99 +73,6 @@ const siteController = {
       site.save()
       user.save()
       res.status(200).end()
-    } catch (error) {
-      console.log(error)
-      res.status(500).end()
-    }
-  },
-  async handleSiteComment (req, res) {
-    const { text, commentId } = req.body
-    let message = {}
-    if (!text && !commentId) {
-      res.status(400).send('未攜帶正確資訊！')
-      return
-    }
-    try {
-      const site = await Site.findById(req.params.id)
-      if (!commentId) {
-        const newComment = {
-          id: req.user.id + new Date().getTime(),
-          date: new Date(),
-          userId: req.user.id,
-          userName: req.user.username,
-          userAvatar: req.user.avatar,
-          text: text
-        }
-        message = newComment
-        site.comments.push(newComment)
-      } else if (!text) {
-        const commentIndex = site.comments.findIndex(comment => comment.id === commentId)
-        if (commentIndex === -1) {
-          res.status(404).end()
-          return
-        }
-        site.comments.splice(commentIndex, 1)
-      } else {
-        const comment = site.comments.find(comment => comment.id === commentId)
-        if (!comment) {
-          res.status(404).end()
-          return
-        }
-        comment.text = text
-        comment.date = new Date()
-      }
-      site.markModified('comments')
-      site.save()
-      res.status(200).send(message)
-    } catch (error) {
-      console.log(error)
-      res.status(500).end()
-    }
-  },
-  async handleSiteReply (req, res) {
-    const { text, replyId } = req.body
-    let message = {}
-    if (!text && !replyId) {
-      res.status(404).send('未攜帶正確資訊！')
-      return
-    }
-    try {
-      const site = await Site.findById(req.params.id)
-      const comment = site.comments.find(comment => comment.id === req.params.commentId)
-      if (!replyId) {
-        const newReply = {
-          id: req.user.id + new Date().getTime(),
-          date: new Date(),
-          userId: req.user.id,
-          userName: req.user.username,
-          userAvatar: req.user.avatar,
-          text: req.body.text
-        }
-        message = newReply
-        // 如果此則留言尚未有任何回覆
-        if (!comment.replies) {
-          comment.replies = []
-        }
-        comment.replies.push(newReply)
-      } else if (!text) {
-        const replyIndex = comment.replies.findIndex(reply => reply.id === replyId)
-        if (replyIndex === -1) {
-          res.status(404).end()
-          return
-        }
-        comment.splice(replyIndex, 1)
-      } else {
-        const reply = comment.replies.find(reply => reply.id === replyId)
-        if (!reply) {
-          res.status(404).end()
-          return
-        }
-        reply.text = text
-        reply.date = new Date()
-      }
-      site.markModified('comments')
-      site.save()
-      res.status(200).send(message)
     } catch (error) {
       console.log(error)
       res.status(500).end()

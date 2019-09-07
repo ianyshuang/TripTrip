@@ -1,6 +1,7 @@
 const Trip = require('../models/trip')
 const User = require('../models/user')
 const MongoClient = require('mongodb').MongoClient
+const dbpath = process.env.MONGODB_URI || 'mongodb://localhost'
 const imgur = require('imgur')
 
 async function uploadImages(paths) {
@@ -68,7 +69,7 @@ const tripController = {
     const { keyword } = req.query
     const regex = new RegExp(keyword, 'i')
     try {
-      const client = await MongoClient.connect('mongodb://localhost', {
+      const client = await MongoClient.connect(dbpath, {
         useNewUrlParser: true,
         useUnifiedTopology: true
       })
