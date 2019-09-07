@@ -5,7 +5,7 @@ const dbpath = process.env.MONGODB_URI || 'mongodb://localhost'
 const imgur = require('imgur')
 
 async function uploadImages(paths) {
-  const imgLinks = []
+  let imgLinks = []
   for (const path of paths) {
     const result = await imgur.uploadFile(path)
     imgLinks.push(result.data.link)
@@ -14,7 +14,7 @@ async function uploadImages(paths) {
 }
 
 const tripController = {
-  async getPopularTrips(req, res) {
+  async getPopularTrips (req, res) {
     try {
       const trips = await Trip.find({}).sort({ collectingCounts: 'desc' })
       const popularTrips = trips.slice(0, 4)
@@ -24,7 +24,7 @@ const tripController = {
       res.status(404).end()
     }
   },
-  async getTrip(req, res) {
+  async getTrip (req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       res.status(200).send(trip)
@@ -33,7 +33,7 @@ const tripController = {
       res.status(404).end()
     }
   },
-  async getTripByCountryAndCities(req, res) {
+  async getTripByCountryAndCities (req, res) {
     let { cities, country } = req.query
     if (cities) {
       try {
@@ -65,8 +65,11 @@ const tripController = {
       }
     }
   },
-  async getTripByKeyword(req, res) {
-    const { keyword } = req.query
+  async getTripsByKeyword (req, res) {
+    let { keyword } = req.query
+    if (keyword.includes('臺')) {
+      keyword = keyword.replace('臺', '台')
+    }
     const regex = new RegExp(keyword, 'i')
     try {
       const client = await MongoClient.connect(dbpath, {
@@ -79,7 +82,7 @@ const tripController = {
         .find({
           $or: [
             { name: { $regex: regex } },
-            { journal: { $regex: regex } },
+            { contents: { $elemMatch: { activities: { $elemMatch: { name: { $regex: regex } } } } } },
             { sites: { $elemMatch: { $elemMatch: { $in: [regex] } } } },
             { country: keyword },
             { cities: keyword }
@@ -94,38 +97,101 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async createTrip(req, res) {
+  async createTrip (req, res) {
     const data = JSON.parse(JSON.stringify(req.body))
     const files = req.files
-    data.days = parseInt(data.days)
+    if (!data.name || !data.sites || data.sites.length === 0) {
+      res.status(400).send('請輸入行程名稱及景點！')
+      return
+    }
+    // 整理 data 格式
+    const activities = []
+    data.contents.forEach(content => {
+      const array = content.activities.map(activity => JSON.parse(activity))
+      activities.push(array)
+    })
+    for (let i = 0; i < data.contents.length; i++) {
+      data.contents[i].activities = activities[i]
+    }
     data.isPrivate = data.isPrivate === 'true'
-    // if (!data.name || !data.days || !data.country || !data.cities || !data.startDate || !data.isPrivate || !data.journal || !data.contents || !data.sites) {
-    //   res.status(400).send('缺少必要的行程資訊！')
-    //   return
-    // }
+    // 上傳圖片並得到回傳的URL
+    let imgLinks = []
     if (files.length !== 0) {
       try {
         imgur.setClientId(process.env.IMGUR_ID)
         const filePaths = files.map(file => file.path)
-        const imgLinks = await uploadImages(filePaths)
-        const trip = await Trip.create({
-          userId: req.user.id,
-          ...data,
-          images: imgLinks,
-          startDate: new Date(data.startDate)
-        })
-        res.status(200).send(trip)
+        imgLinks = await uploadImages(filePaths)
       } catch (error) {
         console.log(error)
         res.status(500).end()
       }
     }
+    // 新增行程
+    try {
+      const trip = await Trip.create({
+        userId: req.user.id,
+        days: data.sites.length,
+        ...data,
+        images: imgLinks,
+        startDate: data.startDate ? new Date(data.startDate) : new Date()
+      })
+      res.status(200).send(trip)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
   },
-  async updateTrip(req, res) {
-    const data = req.body
+  async updateTrip (req, res) {
+    const data = JSON.parse(JSON.stringify(req.body))
+    const files = req.files
+    // 整理 data 格式
+    const deletedImages = data.deletedImages ? data.deletedImages : []
+    delete data['deletedImages']
+    if (data.sites) {
+      const activities = []
+      data.contents.forEach(content => {
+        const array = content.activities.map(activity => JSON.parse(activity))
+        activities.push(array)
+      })
+      for (let i = 0; i < data.contents.length; i++) {
+        data.contents[i].activities = activities[i]
+      }
+    }
+    // 上傳圖片並得到回傳的URL
+    let imgLinks = []
+    if (files.length !== 0) {
+      try {
+        imgur.setClientId(process.env.IMGUR_ID)
+        const filePaths = files.map(file => file.path)
+        imgLinks = await uploadImages(filePaths)
+      } catch (error) {
+        console.log(error)
+        res.status(500).end()
+      }
+    }
     try {
       let trip = await Trip.findById(req.params.id)
+      if (!trip) {
+        res.status(404).end()
+        return
+      }
+      // 將除圖片外的所有屬性更新
       trip = Object.assign(trip, data)
+      // 更新圖片
+      if (deletedImages.length !== 0) {
+        deletedImages.forEach(image => {
+          const index = trip.images.findIndex(url => url === image)
+          if (index !== -1) {
+            trip.images.splice(index, 1)
+          }
+        })
+      }
+      if (imgLinks.length !== 0) {
+        imgLinks.forEach(link => {
+          trip.images.push(link)
+        })
+      }
+      // 完成修改
       trip.markModified('contents')
       trip.markModified('sites')
       trip.markModified('comments')
@@ -136,7 +202,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async deleteTrip(req, res) {
+  async deleteTrip (req, res) {
     try {
       const trip = await Trip.findByIdAndDelete(req.params.id)
       if (!trip) {
@@ -149,7 +215,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async toggleCollectingTrip(req, res) {
+  async toggleCollectingTrip (req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
@@ -178,7 +244,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async forkTrip(req, res) {
+  async forkTrip (req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       if (!trip) {
@@ -203,7 +269,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async rateTrip(req, res) {
+  async rateTrip (req, res) {
     const { rating } = req.body
     if (!rating) {
       res.status(400).send('未傳送評分！')
@@ -216,8 +282,7 @@ const tripController = {
         trip => trip.id === req.params.id
       )
       if (!userRatingObject) {
-        trip.rating =
-          (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
+        trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
         trip.ratingCounts += 1
         user.ratedTrips.push({
           id: req.params.id,
@@ -238,7 +303,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async handleTripComment(req, res) {
+  async handleTripComment (req, res) {
     const { text, commentId } = req.body
     let message = {}
     if (!text && !commentId) {
@@ -282,7 +347,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async handleTripReply(req, res) {
+  async handleTripReply (req, res) {
     const { text, replyId } = req.body
     let message = {}
     if (!text && !replyId) {

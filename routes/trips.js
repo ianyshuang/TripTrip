@@ -12,13 +12,13 @@ router
   .get(tripController.getTripByCountryAndCities)
   .post(authenticated, upload.array('images'), tripController.createTrip)
 
-router.get('/search', tripController.getTripByKeyword)
+router.get('/search', tripController.getTripsByKeyword)
 router.get('/popular', tripController.getPopularTrips)
 
 router
   .route('/:id')
   .get(tripController.getTrip)
-  .patch(authenticated, tripController.updateTrip)
+  .patch(authenticated, upload.array('images'), tripController.updateTrip)
   .delete(authenticated, tripController.deleteTrip)
 
 router.patch('/:id/collect', authenticated, tripController.toggleCollectingTrip)

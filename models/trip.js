@@ -17,7 +17,7 @@ const tripSchema = new Schema({
   },
   country: {
     type: String,
-    required: true
+    default: ''
   },
   cities: {
     type: [String],
