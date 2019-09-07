@@ -15,44 +15,15 @@ db.once('open', () => {
   console.log('success:: connected to mongodb!')
 })
 
-User.find({}).then(users => {
-  const sites = siteData.data.map(site => {
-    const index1 = Math.floor(Math.random() * 10)
-    const index2 = Math.floor(Math.random() * 10)
-    const index3 = Math.floor(Math.random() * 10)
-    return {
-      name: site.name,
-      comments: [
-        {
-          id: users[index1].id + new Date(site.comments[0].date).getTime(),
-          date: site.comments[0].date,
-          userId: users[index1].id,
-          userName: users[index1].username,
-          text: site.comments[0].text,
-          replies: [
-            {
-              id: users[index2].id + new Date(site.comments[0].replies[0].date).getTime(),
-              date: site.comments[0].replies[0].date,
-              userId: users[index2].id,
-              userName:
-                users[index2].username,
-              text: site.comments[0].replies[0].text
-            }
-          ]
-        },
-        {
-          id: users[index3].id + new Date(site.comments[1].date).getTime(),
-          date: site.comments[1].date,
-          userId: users[index3].id,
-          userName: users[index3].username,
-          text: site.comments[1].text
-        }
-      ]
-    }
-  })
-  Site.insertMany(sites).then(sites => {
+const sites = siteData.data.map(site => ({
+  name: site.name,
+  placeId: site.placeId
+}))
+
+Site.insertMany(sites)
+  .then(() => {
     console.log('successfully writing seed data')
-  }).catch(error => {
+  })
+  .catch(error => {
     console.log(error)
   })
-})

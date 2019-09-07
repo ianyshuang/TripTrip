@@ -5,16 +5,16 @@ const siteSchema = new Schema({
     type: String,
     required: true
   },
+  placeId: {
+    type: String,
+    required: true
+  },
   collectingCounts: {
     type: Number,
     default: 0
   },
   collectingUsers: {
     type: [Schema.Types.ObjectId],
-    default: []
-  },
-  comments: {
-    type: [Schema.Types.Mixed],
     default: []
   }
 }, { minimize: false })
