@@ -54,7 +54,8 @@ passport.use(
       try {
         const user = await User.findOne({ email: profile._json.email })
         if (user) {
-          return done(null, user)
+          console.log('already exist')
+          return done(null, false, { status: 404 })
         } else {
           var randomPassword = Math.random()
             .toString(36)
@@ -90,6 +91,7 @@ passport.use(
       try {
         const user = await User.findOne({ email: profile._json.email })
         if (user) {
+          console.log('already exist')
           return done(null, user)
         } else {
           var randomPassword = Math.random()

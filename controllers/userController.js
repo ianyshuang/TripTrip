@@ -33,10 +33,16 @@ const userController = {
       if (user) {
         res.status(403).send({ message: '此 email 已被註冊過！' })
       } else {
-        const newUser = User.create({
+        const newUser = await User.create({
           email,
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
           username,
+        })
+        const payload = { id: newUser.id }
+        const token = jwt.sign(payload, process.env.JWT_SECRET)
+        res.cookie('token', token, {
+          expires: new Date(Date.now() + 1000 * 3600 * 24),
+          httpOnly: true
         })
         res.status(201).send(newUser)
       }
