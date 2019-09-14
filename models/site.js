@@ -9,6 +9,10 @@ const siteSchema = new Schema({
     type: String,
     required: true
   },
+  formatted_address: {
+    type: String,
+    required: true
+  },
   collectingCounts: {
     type: Number,
     default: 0

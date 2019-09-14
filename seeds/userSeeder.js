@@ -13,15 +13,24 @@ db.on('error', () => {
 
 db.once('open', () => {
   console.log('success:: connected to mongodb!')
+  db.dropCollection('users')
+    .then(() => {
+      console.log('successfully dropping users collection')
+      const users = userData.data.map(user => ({
+        ...user,
+        password: bcrypt.hashSync(user.password, bcrypt.genSaltSync(10), null)
+      }))
+
+      User.insertMany(users)
+        .then(users => {
+          console.log('successfully writing seed data')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    })
+    .catch(error => {
+      console.log('fail to drop users collection')
+    })
 })
 
-const users = userData.data.map(user => ({
-  ...user,
-  password: bcrypt.hashSync(user.password, bcrypt.genSaltSync(10), null)
-}))
-
-User.insertMany(users).then(users => {
-  console.log('successfully writing seed data')
-}).catch(error => {
-  console.log(error)
-})

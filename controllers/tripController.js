@@ -43,7 +43,7 @@ const tripController = {
         res.status(200).send(trips)
       } catch (error) {
         console.log(error)
-        res.status(500).end()
+        res.status(404).end()
       }
     } else if (country) {
       try {
@@ -53,7 +53,7 @@ const tripController = {
         res.status(200).send(trips)
       } catch (error) {
         console.log(error)
-        res.status(500).end()
+        res.status(404).end()
       }
     } else {
       try {
@@ -61,7 +61,7 @@ const tripController = {
         res.status(200).send(trips)
       } catch (error) {
         console.log(error)
-        res.status(500).end()
+        res.status(404).end()
       }
     }
   },
@@ -94,7 +94,7 @@ const tripController = {
       client.close()
     } catch (error) {
       console.log(error)
-      res.status(500).end()
+      res.status(404).end()
     }
   },
   async createTrip (req, res) {

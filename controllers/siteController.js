@@ -28,6 +28,42 @@ const siteController = {
       res.status(500).end()
     }
   },
+  async getSitesByCountryAndCities (req, res) {
+    let { cities, country } = req.query
+    if (cities) {
+      let regexArray = cities.map(city => {
+        return new RegExp(city, 'i')
+      })
+      try {
+        const sites = await Site.find({
+          formatted_address: { $in: regexArray }
+        })
+        res.status(200).send(sites)
+      } catch (error) {
+        console.log(error)
+        res.status(404).end()
+      }
+    } else if (country) {
+      try {
+        let regex = new RegExp(country, 'i')
+        const sites = await Site.find({
+          formatted_address: { $regex: regex }
+        })
+        res.status(200).send(sites)
+      } catch (error) {
+        console.log(error)
+        res.status(404).end()
+      }
+    } else {
+      try {
+        const sites = await Site.find({})
+        res.status(200).send(sites)
+      } catch (error) {
+        console.log(error)
+        res.status(404).end()
+      }
+    }
+  },
   async getSite(req, res) {
     try {
       const site = await Site.findOne({ placeId: req.params.id })
@@ -56,17 +92,19 @@ const siteController = {
   },
   async toggleCollectingSite (req, res) {
     try {
-      const site = await Site.findById(req.params.id)
+      const site = await Site.findOne({ placeId: req.params.id})
       const user = await User.findById(req.user.id)
 
       if (site.collectingUsers.includes(user.id)) {
         const userIndex = site.collectingUsers.findIndex(id => id === user.id)
-        const siteIndex = user.collectedSites.findIndex(id => id === site.id)
+        const siteIndex = user.collectedSites.findIndex(id => id === site.placeId)
         site.collectingUsers.splice(userIndex, 1)
+        site.collectingCounts -= 1
         user.collectedSites.splice(siteIndex, 1)
       } else {
+        site.collectingCounts += 1
         site.collectingUsers.push(user.id)
-        user.collectedSites.push(site.id)
+        user.collectedSites.push(site.placeId)
       }
       site.markModified('collectingUsers')
       user.markModified('collectedSites')

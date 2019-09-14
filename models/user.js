@@ -31,7 +31,7 @@ const userSchema = new Schema(
       default: []
     },
     collectedSites: {
-      type: [Schema.Types.ObjectId],
+      type: [String],
       default: []
     },
     ratedTrips: {
