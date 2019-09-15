@@ -7,7 +7,7 @@ const authencitcated = passport.authenticate('jwt', { session: false })
 router.get('/', siteController.getSitesByCountryAndCities)
 router.get('/search', siteController.getSitesByKeyword)
 router.get('/popular', siteController.getPopularSites)
-router.get('/:id', siteController.getSite)
-router.patch('/:id/collect', authencitcated, siteController.toggleCollectingSite)
+router.get('/:placeId', siteController.getSite)
+router.patch('/:placeId/collect', authencitcated, siteController.toggleCollectingSite)
 
 module.exports = router

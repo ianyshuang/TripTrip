@@ -66,7 +66,7 @@ const siteController = {
   },
   async getSite(req, res) {
     try {
-      const site = await Site.findOne({ placeId: req.params.id })
+      const site = await Site.findOne({ placeId: req.params.placeId })
       if (!site) {
         res.status(404).end()
         return
@@ -92,7 +92,7 @@ const siteController = {
   },
   async toggleCollectingSite (req, res) {
     try {
-      const site = await Site.findOne({ placeId: req.params.id})
+      const site = await Site.findOne({ placeId: req.params.placeId})
       const user = await User.findById(req.user.id)
 
       if (site.collectingUsers.includes(user.id)) {

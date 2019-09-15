@@ -8,14 +8,19 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy
 
 passport.use(
   // 用 req.body.email 驗證
-  new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-    User.findOne({ email })
-      .then(user => {
-        if (!user) return done(null, false, 404)
-        if (!bcrypt.compareSync(password, user.password)) return done(null, false, 401)
-        return done(null, user)
-      })
-      .catch(error => done(error))
+  new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+    try {
+       const user = await User.findOne({ email })
+        if (!user) {
+          return done(null, false, 404)
+        } else {
+          if (!bcrypt.compareSync(password, user.password)) return done(null, false, 422)
+          return done(null, user)
+        }
+    } catch (error) {
+      console.log(error)
+      return done(error)
+    }
   })
 )
 
@@ -54,8 +59,11 @@ passport.use(
       try {
         const user = await User.findOne({ email: profile._json.email })
         if (user) {
-          console.log('already exist')
-          return done(null, false, { status: 404 })
+          if (user.accountType !== 'facebook') {
+            return done(null, false, { status: 409 })
+          } else {
+            return done(null, user)
+          }
         } else {
           var randomPassword = Math.random()
             .toString(36)
@@ -68,7 +76,8 @@ passport.use(
               bcrypt.genSaltSync(10),
               null
             ),
-            avatar: profile.photos[0].value ? profile.photos[0].value : null
+            avatar: profile.photos[0].value ? profile.photos[0].value : null,
+            accountType: 'facebook'
           })
           return done(null, newUser)
         }
@@ -91,8 +100,11 @@ passport.use(
       try {
         const user = await User.findOne({ email: profile._json.email })
         if (user) {
-          console.log('already exist')
-          return done(null, user)
+          if (user.accountType !== 'google') {
+            return done(null, false, { status: 409 })
+          } else {
+            return done(null, user)
+          }
         } else {
           var randomPassword = Math.random()
             .toString(36)
@@ -105,7 +117,8 @@ passport.use(
               bcrypt.genSaltSync(10),
               null
             ),
-            avatar: profile.picture ? profile.picture : null
+            avatar: profile.picture ? profile.picture : null,
+            accountType: 'google'
           })
           return done(null, newUser)
         }

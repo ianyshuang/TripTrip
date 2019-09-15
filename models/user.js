@@ -18,6 +18,10 @@ const userSchema = new Schema(
       type: String,
       default: ''
     },
+    accountType: {
+      type: String,
+      default: 'local'
+    },
     avatar: {
       type: String,
       default: null

@@ -31,7 +31,7 @@ const userController = {
     try {
       const user = await User.findOne({ email })
       if (user) {
-        res.status(403).send({ message: '此 email 已被註冊過！' })
+        res.status(409).send({ message: '此 email 已被註冊過！' })
       } else {
         const newUser = await User.create({
           email,
