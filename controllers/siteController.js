@@ -31,13 +31,10 @@ const siteController = {
   async getSitesByCountryAndCities (req, res) {
     let { cities, country } = req.query
     if (cities) {
-      let regexArray = cities.map(city => {
-        return new RegExp(city, 'i')
-      })
       try {
         const sites = await Site.find({
-          formatted_address: { $in: regexArray }
-        })
+          city: { $in: cities }
+        }).sort({ collectingCounts: -1 })
         res.status(200).send(sites)
       } catch (error) {
         console.log(error)
@@ -47,7 +44,7 @@ const siteController = {
       try {
         let regex = new RegExp(country, 'i')
         const sites = await Site.find({
-          formatted_address: { $regex: regex }
+          address: { $regex: regex }
         })
         res.status(200).send(sites)
       } catch (error) {

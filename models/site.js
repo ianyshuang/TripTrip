@@ -9,9 +9,17 @@ const siteSchema = new Schema({
     type: String,
     required: true
   },
-  formatted_address: {
+  address: {
     type: String,
     required: true
+  },
+  city: {
+    type: String,
+    default: ''
+  },
+  village: {
+    type: String,
+    default: ''
   },
   collectingCounts: {
     type: Number,

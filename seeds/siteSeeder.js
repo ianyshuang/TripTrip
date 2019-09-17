@@ -15,11 +15,31 @@ db.once('open', () => {
   db.dropCollection('sites')
     .then(() => {
       console.log('successfully dropping sites collection')
+      // add city and village to site
+      for (let site of siteData) {
+        site.city = ''
+        site.village = ''
+        for (let component of site.address_components) {
+          if (component.types.includes('administrative_area_level_3')) {
+            site.village = component.long_name
+          }
+          if (component.types.includes('administrative_area_level_1')) {
+            site.city = component.long_name
+            break
+          } else if (component.types.includes('administrative_area_level_2')) {
+            site.city = component.long_name
+          }
+        }
+      }
+      // wrapping into an object
       const sites = siteData.map(site => ({
         name: site.name,
         placeId: site.placeId,
-        formatted_address: site.formatted_address
+        address: site.formatted_address,
+        city: site.city,
+        village: site.village
       }))
+      // insert to db
       Site.insertMany(sites)
         .then(() => {
           console.log('successfully writing seed data')
@@ -32,6 +52,3 @@ db.once('open', () => {
       console.log('fail to drop sites collection')
     })
 })
-
-
-

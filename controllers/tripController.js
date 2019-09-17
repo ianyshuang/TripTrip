@@ -98,22 +98,23 @@ const tripController = {
     }
   },
   async createTrip (req, res) {
-    const data = JSON.parse(JSON.stringify(req.body))
+    const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
+    const data = JSON.parse(body.data)
     if (!data.name || !data.sites || data.sites.length === 0) {
       res.status(400).send('請輸入行程名稱及景點！')
       return
     }
-    // 整理 data 格式
-    const activities = []
-    data.contents.forEach(content => {
-      const array = content.activities.map(activity => JSON.parse(activity))
-      activities.push(array)
-    })
-    for (let i = 0; i < data.contents.length; i++) {
-      data.contents[i].activities = activities[i]
-    }
-    data.isPrivate = data.isPrivate === 'true'
+    // 整理 data 格式 (Postman 才需要，axios 不用)
+    // const activities = []
+    // data.contents.forEach(content => {
+    //   const array = content.activities.map(activity => JSON.parse(activity))
+    //   activities.push(array)
+    // })
+    // for (let i = 0; i < data.contents.length; i++) {
+    //   data.contents[i].activities = activities[i]
+    // }
+    // data.isPrivate = data.isPrivate === 'true'
     // 上傳圖片並得到回傳的URL
     let imgLinks = []
     if (files.length !== 0) {
@@ -123,7 +124,6 @@ const tripController = {
         imgLinks = await uploadImages(filePaths)
       } catch (error) {
         console.log(error)
-        res.status(500).end()
       }
     }
     // 新增行程
@@ -142,21 +142,24 @@ const tripController = {
     }
   },
   async updateTrip (req, res) {
-    const data = JSON.parse(JSON.stringify(req.body))
+    const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
-    // 整理 data 格式
+    const data = JSON.parse(body.data)
     const deletedImages = data.deletedImages ? data.deletedImages : []
-    delete data['deletedImages']
-    if (data.sites) {
-      const activities = []
-      data.contents.forEach(content => {
-        const array = content.activities.map(activity => JSON.parse(activity))
-        activities.push(array)
-      })
-      for (let i = 0; i < data.contents.length; i++) {
-        data.contents[i].activities = activities[i]
-      }
-    }
+    delete data['deletedImages'] // 從 data 拿掉以免加進去原本 trip 的屬性
+
+    // 整理 data 格式 (Postman 才需要，axios 不用)
+    // if (data.sites) {
+    //   const activities = []
+    //   data.contents.forEach(content => {
+    //     const array = content.activities.map(activity => JSON.parse(activity))
+    //     activities.push(array)
+    //   })
+    //   for (let i = 0; i < data.contents.length; i++) {
+    //     data.contents[i].activities = activities[i]
+    //   }
+    // }
+
     // 上傳圖片並得到回傳的URL
     let imgLinks = []
     if (files.length !== 0) {
@@ -177,7 +180,7 @@ const tripController = {
       }
       // 將除圖片外的所有屬性更新
       trip = Object.assign(trip, data)
-      // 更新圖片
+      // 刪除舊圖片
       if (deletedImages.length !== 0) {
         deletedImages.forEach(image => {
           const index = trip.images.findIndex(url => url === image)
@@ -186,6 +189,7 @@ const tripController = {
           }
         })
       }
+      // 加入新圖片
       if (imgLinks.length !== 0) {
         imgLinks.forEach(link => {
           trip.images.push(link)
