@@ -13,8 +13,8 @@ const userController = {
         res.status(404).end()
       } else {
         const data = { ...user._doc }
-        data.collectedTrips = await Trip.find({_id: { $in: data.collectedTrips }})
-        data.ownedTrips = await Trip.find({_id: { $in: data.ownedTrips }})
+        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips } })
+        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
         res.status(200).send(data)
       }
     } catch (error) {
@@ -36,7 +36,7 @@ const userController = {
         const newUser = await User.create({
           email,
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
-          username,
+          username
         })
         const payload = { id: newUser.id }
         const token = jwt.sign(payload, process.env.JWT_SECRET)
@@ -68,8 +68,8 @@ const userController = {
         return
       } else {
         const data = { ...user._doc }
-        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips }})
-        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips }})
+        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips } })
+        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
         res.status(200).send(data)
       }
     } catch (error) {
@@ -80,7 +80,7 @@ const userController = {
   async editProfile (req, res) {
     const text = JSON.parse(JSON.stringify(req.body))
     const file = req.file
-    const { username , password, introduction } = text
+    const { username, password, introduction } = text
     let imgurObject = null
     if (file) {
       try {
@@ -94,9 +94,9 @@ const userController = {
     }
     try {
       const user = await User.findById(req.user.id)
-      user.username = username ? username : user.username
+      user.username = username || user.username
       user.password = password ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null) : user.password
-      user.introduction = introduction ? introduction : user.introduction
+      user.introduction = introduction || user.introduction
       user.avatar = file ? imgurObject.data.link : user.avatar
       user.save()
       res.status(200).send(user)
@@ -127,7 +127,7 @@ const userController = {
           }
         })
         const randomCode = Math.random().toString(36).slice(-20)
-        let options = {
+        const options = {
           from: 'triptrip.official@gmail.com',
           to: email,
           subject: 'TripTrip 重設您的密碼',

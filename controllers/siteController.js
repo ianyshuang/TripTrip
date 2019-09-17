@@ -1,11 +1,10 @@
 const Site = require('../models/site')
 const User = require('../models/user')
-const Trip = require('../models/trip')
 const MongoClient = require('mongodb').MongoClient
 const dbpath = process.env.MONGODB_URI || 'mongodb://localhost'
 
 const siteController = {
-  async getSitesByKeyword(req, res) {
+  async getSitesByKeyword (req, res) {
     const { keyword } = req.query
     const regex = new RegExp(keyword, 'i')
     try {
@@ -18,7 +17,7 @@ const siteController = {
       res.status(500).end()
     }
   },
-  async getPopularSites(req, res) {
+  async getPopularSites (req, res) {
     try {
       const sites = await Site.find({}).sort({ collectingCounts: -1 })
       const popularSites = sites.slice(0, 4)
@@ -29,7 +28,7 @@ const siteController = {
     }
   },
   async getSitesByCountryAndCities (req, res) {
-    let { cities, country } = req.query
+    const { cities, country } = req.query
     if (cities) {
       try {
         const sites = await Site.find({
@@ -42,7 +41,7 @@ const siteController = {
       }
     } else if (country) {
       try {
-        let regex = new RegExp(country, 'i')
+        const regex = new RegExp(country, 'i')
         const sites = await Site.find({
           address: { $regex: regex }
         })
@@ -61,7 +60,7 @@ const siteController = {
       }
     }
   },
-  async getSite(req, res) {
+  async getSite (req, res) {
     try {
       const site = await Site.findOne({ placeId: req.params.placeId })
       if (!site) {
@@ -89,7 +88,7 @@ const siteController = {
   },
   async toggleCollectingSite (req, res) {
     try {
-      const site = await Site.findOne({ placeId: req.params.placeId})
+      const site = await Site.findOne({ placeId: req.params.placeId })
       const user = await User.findById(req.user.id)
 
       if (site.collectingUsers.includes(user.id)) {

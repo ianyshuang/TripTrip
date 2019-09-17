@@ -8,12 +8,12 @@ router.get(
   '/redirect',
   (req, res, next) => {
     passport.authenticate('google', (err, user, info) => {
-      if (err)
-        return res.redirect('http://localhost:8080/#/redirect?error=true')
-      if (Object.keys(info).length !== 0)
+      if (err) { return res.redirect('http://localhost:8080/#/redirect?error=true') }
+      if (Object.keys(info).length !== 0) {
         return res.redirect(
           `http://localhost:8080#/redirect?status=${info.status}`
         )
+      }
       req.logIn(user, { session: false }, (err) => {
         if (err) return next(err)
         next()

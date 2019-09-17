@@ -6,7 +6,7 @@ const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
 
 const authenticated = passport.authenticate('jwt', { session: false })
-const authenticate_forgot = require('../utils/verify_token')
+const authenticateForgot = require('../utils/verify_token')
 
 router
   .route('/')
@@ -14,7 +14,7 @@ router
   .patch(authenticated, upload.single('image'), userController.editProfile)
 router.get('/:id', userController.getUserById)
 router.post('/forgot_password', userController.issueForgotPasswordToken)
-router.get('/validate_reset/:randomCode', authenticate_forgot, userController.validateReset)
-router.patch('/reset_password', authenticate_forgot, userController.resetPassword)
+router.get('/validate_reset/:randomCode', authenticateForgot, userController.validateReset)
+router.patch('/reset_password', authenticateForgot, userController.resetPassword)
 
 module.exports = router

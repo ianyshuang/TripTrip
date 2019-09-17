@@ -16,10 +16,10 @@ db.once('open', () => {
     .then(() => {
       console.log('successfully dropping sites collection')
       // add city and village to site
-      for (let site of siteData) {
+      for (const site of siteData) {
         site.city = ''
         site.village = ''
-        for (let component of site.address_components) {
+        for (const component of site.address_components) {
           if (component.types.includes('administrative_area_level_3')) {
             site.village = component.long_name
           }
@@ -49,6 +49,7 @@ db.once('open', () => {
         })
     })
     .catch(error => {
+      console.log(error)
       console.log('fail to drop sites collection')
     })
 })

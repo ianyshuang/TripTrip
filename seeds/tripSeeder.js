@@ -66,7 +66,7 @@ db.once('open', () => {
       })
     })
     .catch(error => {
+      console.log(error)
       console.log('fail to drop trips collection')
     })
 })
-

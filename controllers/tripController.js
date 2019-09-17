@@ -4,8 +4,8 @@ const MongoClient = require('mongodb').MongoClient
 const dbpath = process.env.MONGODB_URI || 'mongodb://localhost'
 const imgur = require('imgur')
 
-async function uploadImages(paths) {
-  let imgLinks = []
+async function uploadImages (paths) {
+  const imgLinks = []
   for (const path of paths) {
     const result = await imgur.uploadFile(path)
     imgLinks.push(result.data.link)
@@ -34,7 +34,7 @@ const tripController = {
     }
   },
   async getTripByCountryAndCities (req, res) {
-    let { cities, country } = req.query
+    const { cities, country } = req.query
     if (cities) {
       try {
         const trips = await Trip.find({
@@ -117,7 +117,7 @@ const tripController = {
     // data.isPrivate = data.isPrivate === 'true'
     // 上傳圖片並得到回傳的URL
     let imgLinks = []
-    if (files.length !== 0) {
+    if (files && files.length !== 0) {
       try {
         imgur.setClientId(process.env.IMGUR_ID)
         const filePaths = files.map(file => file.path)
@@ -162,7 +162,7 @@ const tripController = {
 
     // 上傳圖片並得到回傳的URL
     let imgLinks = []
-    if (files.length !== 0) {
+    if (files && files.length !== 0) {
       try {
         imgur.setClientId(process.env.IMGUR_ID)
         const filePaths = files.map(file => file.path)
@@ -224,14 +224,10 @@ const tripController = {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
       if (trip.collectingUsers.includes(req.user.id)) {
-        const userIdIndex = trip.collectingUsers.findIndex(
-          id => id === req.user.id
-        )
+        const userIdIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
         trip.collectingUsers.splice(userIdIndex, 1)
         trip.collectingCounts -= 1
-        const tripIdIndex = user.collectedTrips.findIndex(
-          id => id === req.params.id
-        )
+        const tripIdIndex = user.collectedTrips.findIndex(id => id === req.params.id)
         user.collectedTrips.splice(tripIdIndex, 1)
       } else {
         trip.collectingUsers.push(req.user.id)
@@ -255,7 +251,7 @@ const tripController = {
         res.status(404).end()
         return
       }
-      const { name, days, country, cities, startDate, contents, sites } = trip
+      const { name, days, country, cities, contents, sites } = trip
       const newTrip = await Trip.create({
         userId: req.user.id,
         isPrivate: false,
@@ -263,7 +259,6 @@ const tripController = {
         days,
         country,
         cities,
-        startDate,
         contents,
         sites
       })
@@ -282,9 +277,7 @@ const tripController = {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
-      const userRatingObject = user.ratedTrips.find(
-        trip => trip.id === req.params.id
-      )
+      const userRatingObject = user.ratedTrips.find(trip => trip.id === req.params.id)
       if (!userRatingObject) {
         trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
         trip.ratingCounts += 1
@@ -293,9 +286,7 @@ const tripController = {
           userRating: rating
         })
       } else {
-        trip.rating =
-          (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) /
-          trip.ratingCounts
+        trip.rating = (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) / trip.ratingCounts
         userRatingObject.userRating = rating
       }
       user.markModified('ratedTrips')
