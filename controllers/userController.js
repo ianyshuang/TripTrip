@@ -1,27 +1,12 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Trip = require('../models/trip')
+const Site = require('../models/site')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const imgur = require('imgur')
 
 const userController = {
-  async signin (req, res) {
-    try {
-      const user = await User.findById(req.user.id).select('-password')
-      if (!user) {
-        res.status(404).end()
-      } else {
-        const data = { ...user._doc }
-        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips } })
-        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
-        res.status(200).send(data)
-      }
-    } catch (error) {
-      console.log(error)
-      res.status(500).end()
-    }
-  },
   async signup (req, res) {
     const { email, password, username } = req.body
     if (!email || !password || !username) {
@@ -38,6 +23,7 @@ const userController = {
           password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
           username
         })
+        delete newUser.password
         const payload = { id: newUser.id }
         const token = jwt.sign(payload, process.env.JWT_SECRET)
         res.cookie('token', token, {
@@ -53,7 +39,7 @@ const userController = {
   },
   async getUser (req, res) {
     try {
-      const user = await User.findById(req.user.id)
+      const user = await User.findById(req.user.id).select('-password')
       if (!user) {
         res.status(404).end()
         return
@@ -64,9 +50,9 @@ const userController = {
       res.status(500)
     }
   },
-  async getProfile (req, res) {
+  async getProfileById (req, res) {
     try {
-      const user = await User.findById(req.user.id).select('-password')
+      const user = await User.findById(req.params.id).select('-password')
       if (!user) {
         res.status(404).end()
         return
@@ -74,6 +60,8 @@ const userController = {
         const data = { ...user._doc }
         data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips }})
         data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips }})
+        data.ratedTrips = await Trip.find({ _id: { $in: data.ratedTrips }})
+        data.collectedSites = await Site.find({ placeId: { $in: data.collectedSites }})
         res.status(200).send(data)
       }
     } catch (error) {
@@ -87,31 +75,8 @@ const userController = {
       if (!user) {
         res.status(404).end()
         return
-      } else {
-        const data = { ...user._doc }
-        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips } })
-        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
-        res.status(200).send(data)
       }
-    } catch (error) {
-      console.log(error)
-      res.status(500).end()
-    }
-  },
-  async getProfileById (req, res) {
-    try {
-      const user = await User.findById(req.params.id).select('-password')
-      if (!user) {
-        res.status(404).end()
-        return
-      } else {
-        const data = { ...user._doc }
-        data.collectedTrips = await Trip.find({
-          _id: { $in: data.collectedTrips }
-        })
-        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
-        res.status(200).send(data)
-      }
+      res.status(200).send(user)
     } catch (error) {
       console.log(error)
       res.status(500).end()
