@@ -16,7 +16,7 @@ async function uploadImages (paths) {
 const tripController = {
   async getPopularTrips (req, res) {
     try {
-      const trips = await Trip.find({}).sort({ collectingCounts: 'desc' })
+      const trips = await Trip.find({}).sort({ collectingCounts: -1 })
       const popularTrips = trips.slice(0, 4)
       res.status(200).send(popularTrips)
     } catch (error) {
@@ -27,10 +27,14 @@ const tripController = {
   async getTrip (req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
+      if (!trip) {
+        res.status(404).end()
+        return
+      }
       res.status(200).send(trip)
     } catch (error) {
       console.log(error)
-      res.status(404).end()
+      res.status(500).end()
     }
   },
   async getTripByCountryAndCities (req, res) {
@@ -43,7 +47,7 @@ const tripController = {
         res.status(200).send(trips)
       } catch (error) {
         console.log(error)
-        res.status(404).end()
+        res.status(500).end()
       }
     } else if (country) {
       try {
@@ -53,7 +57,7 @@ const tripController = {
         res.status(200).send(trips)
       } catch (error) {
         console.log(error)
-        res.status(404).end()
+        res.status(500).end()
       }
     } else {
       try {
@@ -61,7 +65,7 @@ const tripController = {
         res.status(200).send(trips)
       } catch (error) {
         console.log(error)
-        res.status(404).end()
+        res.status(500).end()
       }
     }
   },
@@ -94,7 +98,7 @@ const tripController = {
       client.close()
     } catch (error) {
       console.log(error)
-      res.status(404).end()
+      res.status(500).end()
     }
   },
   async createTrip (req, res) {
@@ -159,24 +163,23 @@ const tripController = {
     //     data.contents[i].activities = activities[i]
     //   }
     // }
-
-    // 上傳圖片並得到回傳的URL
-    let imgLinks = []
-    if (files && files.length !== 0) {
-      try {
-        imgur.setClientId(process.env.IMGUR_ID)
-        const filePaths = files.map(file => file.path)
-        imgLinks = await uploadImages(filePaths)
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
-      }
-    }
     try {
       let trip = await Trip.findById(req.params.id)
       if (!trip) {
         res.status(404).end()
         return
+      }
+      // 上傳圖片並得到回傳的URL
+      let imgLinks = []
+      if (files && files.length !== 0) {
+        try {
+          imgur.setClientId(process.env.IMGUR_ID)
+          const filePaths = files.map(file => file.path)
+          imgLinks = await uploadImages(filePaths)
+        } catch (error) {
+          console.log(error)
+          res.status(500).end()
+        }
       }
       // 將除圖片外的所有屬性更新
       trip = Object.assign(trip, data)
@@ -223,6 +226,10 @@ const tripController = {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
+      if (!trip) {
+        res.status(404).end()
+        return
+      }
       if (trip.collectingUsers.includes(req.user.id)) {
         const userIdIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
         trip.collectingUsers.splice(userIdIndex, 1)
@@ -277,6 +284,10 @@ const tripController = {
     try {
       const trip = await Trip.findById(req.params.id)
       const user = await User.findById(req.user.id)
+      if (!trip) {
+        res.status(404).end()
+        return
+      }
       const userRatingObject = user.ratedTrips.find(trip => trip.id === req.params.id)
       if (!userRatingObject) {
         trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
@@ -307,6 +318,10 @@ const tripController = {
     }
     try {
       const trip = await Trip.findById(req.params.id)
+      if (!trip) {
+        res.status(404).send('無此行程')
+        return
+      }
       if (!commentId) {
         const newComment = {
           id: req.user.id + new Date().getTime(),
@@ -321,14 +336,14 @@ const tripController = {
       } else if (!text) {
         const commentIndex = trip.comments.findIndex(comment => comment.id === commentId)
         if (commentIndex === -1) {
-          res.status(404).end()
+          res.status(404).send('無此評論')
           return
         }
         trip.comments.splice(commentIndex, 1)
       } else {
         const comment = trip.comments.find(comment => comment.id === commentId)
         if (!comment) {
-          res.status(404).end()
+          res.status(404).send('無此評論')
           return
         }
         comment.text = text
@@ -352,6 +367,14 @@ const tripController = {
     try {
       const trip = await Trip.findById(req.params.id)
       const comment = trip.comments.find(comment => comment.id === req.params.commentId)
+      if (!trip) {
+        res.status(404).send('無此行程')
+         return
+      }
+      if (!comment) {
+        res.status(404).send('無此評論')
+        return
+      }
       if (!replyId) {
         const newReply = {
           id: req.user.id + new Date().getTime(),
@@ -370,14 +393,14 @@ const tripController = {
       } else if (!text) {
         const replyIndex = comment.replies.findIndex(reply => reply.id === replyId)
         if (replyIndex === -1) {
-          res.status(404).end()
+          res.status(404).send('無此回覆')
           return
         }
         comment.replies.splice(replyIndex, 1)
       } else {
         const reply = comment.replies.find(reply => reply.id === replyId)
         if (!reply) {
-          res.status(404).end()
+          res.status(404).send('無此回覆')
           return
         }
         reply.text = text

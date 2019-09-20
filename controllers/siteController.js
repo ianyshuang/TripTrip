@@ -30,14 +30,19 @@ const siteController = {
   async getSitesByCountryAndCities (req, res) {
     const { cities, country } = req.query
     if (cities) {
+      const regexArray = []
+      for (let city of cities) {
+        regexArray.push(new RegExp(city, 'i'))
+      }
+      console.log(regexArray)
       try {
         const sites = await Site.find({
-          city: { $in: cities }
+          city: { $in: regexArray }
         }).sort({ collectingCounts: -1 })
         res.status(200).send(sites)
       } catch (error) {
         console.log(error)
-        res.status(404).end()
+        res.status(500).end()
       }
     } else if (country) {
       try {
@@ -48,7 +53,7 @@ const siteController = {
         res.status(200).send(sites)
       } catch (error) {
         console.log(error)
-        res.status(404).end()
+        res.status(500).end()
       }
     } else {
       try {
@@ -56,7 +61,7 @@ const siteController = {
         res.status(200).send(sites)
       } catch (error) {
         console.log(error)
-        res.status(404).end()
+        res.status(500).end()
       }
     }
   },
@@ -90,7 +95,10 @@ const siteController = {
     try {
       const site = await Site.findOne({ placeId: req.params.placeId })
       const user = await User.findById(req.user.id)
-
+      if (!site) {
+        res.status(404).end()
+        return
+      }
       if (site.collectingUsers.includes(user.id)) {
         const userIndex = site.collectingUsers.findIndex(id => id === user.id)
         const siteIndex = user.collectedSites.findIndex(id => id === site.placeId)

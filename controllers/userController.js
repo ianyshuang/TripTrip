@@ -54,10 +54,31 @@ const userController = {
   async getUser (req, res) {
     try {
       const user = await User.findById(req.user.id)
+      if (!user) {
+        res.status(404).end()
+        return
+      }
       res.status(200).send(user)
     } catch (error) {
       console.log(error)
       res.status(500)
+    }
+  },
+  async getProfile (req, res) {
+    try {
+      const user = await User.findById(req.user.id).select('-password')
+      if (!user) {
+        res.status(404).end()
+        return
+      } else {
+        const data = { ...user._doc }
+        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips }})
+        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips }})
+        res.status(200).send(data)
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
     }
   },
   async getUserById (req, res) {
@@ -69,6 +90,25 @@ const userController = {
       } else {
         const data = { ...user._doc }
         data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips } })
+        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
+        res.status(200).send(data)
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async getProfileById (req, res) {
+    try {
+      const user = await User.findById(req.params.id).select('-password')
+      if (!user) {
+        res.status(404).end()
+        return
+      } else {
+        const data = { ...user._doc }
+        data.collectedTrips = await Trip.find({
+          _id: { $in: data.collectedTrips }
+        })
         data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips } })
         res.status(200).send(data)
       }
