@@ -12,5 +12,6 @@ router.use('/google', require('./google'))
 router.use('/sites', require('./sites'))
 router.use('/trips', require('./trips'))
 router.use('/users', require('./users'))
+router.use('/admin', require('./admin'))
 
 module.exports = router

@@ -31,7 +31,7 @@ const siteController = {
     const { cities, country } = req.query
     if (cities) {
       const regexArray = []
-      for (let city of cities) {
+      for (const city of cities) {
         regexArray.push(new RegExp(city, 'i'))
       }
       console.log(regexArray)
@@ -115,6 +115,28 @@ const siteController = {
       site.save()
       user.save()
       res.status(200).end()
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async getSites (req, res) {
+    try {
+      const sites = await Site.find({})
+      res.status(200).send(sites)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async deleteSite (req, res) {
+    try {
+      const site = await Site.findByIdAndDelete(req.params.id)
+      if (site) {
+        res.status(200).end()
+      } else {
+        res.status(404).end()
+      }
     } catch (error) {
       console.log(error)
       res.status(500).end()

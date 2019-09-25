@@ -225,26 +225,42 @@ const tripController = {
   async toggleCollectingTrip (req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
-      const user = await User.findById(req.user.id)
+      const userCollecting = await User.findById(req.user.id)
+      const userCollected = await User.findById(trip.userId)
+      console.log(userCollecting)
+      console.log(userCollected)
+      // trip 不存在
       if (!trip) {
         res.status(404).end()
         return
       }
+      // 不可收藏自己的 trip
+      if (String(trip.userId) === req.user.id) {
+        res.status(400).end()
+        return
+      }
+      // 以收藏則取消收藏，反之則加入收藏
       if (trip.collectingUsers.includes(req.user.id)) {
-        const userIdIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
-        trip.collectingUsers.splice(userIdIndex, 1)
+        const userCollectingIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
+        trip.collectingUsers.splice(userCollectingIndex, 1)
         trip.collectingCounts -= 1
-        const tripIdIndex = user.collectedTrips.findIndex(id => id === req.params.id)
-        user.collectedTrips.splice(tripIdIndex, 1)
+        const tripCollectingIndex = userCollecting.collectingTrips.findIndex(id => id === trip.id)
+        userCollecting.collectingTrips.splice(tripCollectingIndex, 1)
+        const tripCollectedIndex = userCollected.collectedTrips.findIndex(id => id === trip.id)
+        userCollected.collectedTrips.splice(tripCollectedIndex, 1)
       } else {
         trip.collectingUsers.push(req.user.id)
         trip.collectingCounts += 1
-        user.collectedTrips.push(req.params.id)
+        userCollecting.collectingTrips.push(trip.id)
+        userCollected.collectedTrips.push(trip.id)
       }
+      // markModified 以儲存修改
       trip.markModified('collectingUsers')
-      user.markModified('collectedTrips')
+      userCollecting.markModified('collectingTrips')
+      userCollected.markModified('collectedTrips')
       trip.save()
-      user.save()
+      userCollecting.save()
+      userCollected.save()
       res.status(200).end()
     } catch (error) {
       console.log(error)
@@ -288,11 +304,11 @@ const tripController = {
         res.status(404).end()
         return
       }
-      const userRatingObject = user.ratedTrips.find(trip => trip.id === req.params.id)
+      const userRatingObject = user.ratingTrips.find(trip => trip.id === req.params.id)
       if (!userRatingObject) {
         trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
         trip.ratingCounts += 1
-        user.ratedTrips.push({
+        user.ratingTrips.push({
           id: req.params.id,
           userRating: rating
         })
@@ -300,7 +316,7 @@ const tripController = {
         trip.rating = (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) / trip.ratingCounts
         userRatingObject.userRating = rating
       }
-      user.markModified('ratedTrips')
+      user.markModified('ratingTrips')
       user.save()
       trip.save()
       res.status(200).end()
@@ -327,7 +343,7 @@ const tripController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.username,
+          username: req.user.username,
           userAvatar: req.user.avatar,
           text: text
         }
@@ -369,7 +385,7 @@ const tripController = {
       const comment = trip.comments.find(comment => comment.id === req.params.commentId)
       if (!trip) {
         res.status(404).send('無此行程')
-         return
+        return
       }
       if (!comment) {
         res.status(404).send('無此評論')
@@ -380,7 +396,7 @@ const tripController = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
           userId: req.user.id,
-          userName: req.user.username,
+          username: req.user.username,
           userAvatar: req.user.avatar,
           text: req.body.text
         }

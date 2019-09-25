@@ -26,7 +26,15 @@ const userSchema = new Schema(
       type: String,
       default: null
     },
-    ownedTrips: {
+    createdAt: {
+      type: Date,
+      default: Date.now()
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false
+    },
+    owningTrips: {
       type: [Schema.Types.ObjectId],
       default: []
     },
@@ -34,11 +42,15 @@ const userSchema = new Schema(
       type: [Schema.Types.ObjectId],
       default: []
     },
-    collectedSites: {
+    collectingTrips: {
+      type: [Schema.Types.ObjectId],
+      default: []
+    },
+    collectingSites: {
       type: [String],
       default: []
     },
-    ratedTrips: {
+    ratingTrips: {
       type: Schema.Types.Mixed,
       default: []
     }

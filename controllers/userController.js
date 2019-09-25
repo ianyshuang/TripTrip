@@ -58,10 +58,12 @@ const userController = {
         return
       } else {
         const data = { ...user._doc }
-        data.collectedTrips = await Trip.find({ _id: { $in: data.collectedTrips }})
-        data.ownedTrips = await Trip.find({ _id: { $in: data.ownedTrips }})
-        data.ratedTrips = await Trip.find({ _id: { $in: data.ratedTrips }})
-        data.collectedSites = await Site.find({ placeId: { $in: data.collectedSites }})
+        data.collectingTrips = await Trip.find({ _id: { $in: data.collectingTrips } })
+        data.owningTrips = await Trip.find({ _id: { $in: data.owningTrips } })
+        data.ratingTrips = await Trip.find({ _id: { $in: data.ratingTrips } })
+        data.collectedSites = await Site.find({
+          placeId: { $in: data.collectedSites }
+        })
         res.status(200).send(data)
       }
     } catch (error) {
@@ -100,7 +102,9 @@ const userController = {
     try {
       const user = await User.findById(req.user.id)
       user.username = username || user.username
-      user.password = password ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null) : user.password
+      user.password = password
+        ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
+        : user.password
       user.introduction = introduction || user.introduction
       user.avatar = file ? imgurObject.data.link : user.avatar
       user.save()
@@ -131,7 +135,9 @@ const userController = {
             pass: process.env.MAIL_PASSWORD
           }
         })
-        const randomCode = Math.random().toString(36).slice(-20)
+        const randomCode = Math.random()
+          .toString(36)
+          .slice(-20)
         const options = {
           from: 'triptrip.official@gmail.com',
           to: email,
@@ -140,9 +146,12 @@ const userController = {
                 <a href="https://triptrip-backend.herokuapp.com/users/validate_reset/${randomCode}">重設密碼</a>
                 <p> TripTrip 管理團隊</p>`
         }
-        transporter.sendMail(options).then(info => {
-          console.log(info.response)
-        }).catch(error => console.log(error))
+        transporter
+          .sendMail(options)
+          .then(info => {
+            console.log(info.response)
+          })
+          .catch(error => console.log(error))
         res.cookie('forgot_password', token, {
           expires: new Date(Date.now() + 1000 * 60 * 5),
           httpOnly: true
@@ -172,6 +181,35 @@ const userController = {
         user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
         user.save()
         res.status(200).end()
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async getUsers (req, res) {
+    try {
+      const users = await User.find({})
+      const data = users.map(user => ({
+        name: user.username,
+        email: user.email,
+        collectingTrips: user.collectingTrips.length,
+        collectedTrips: user.collectedTrips.length
+      }))
+      res.status(200).send(data)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async deleteUser (req, res) {
+    try {
+      const user = await User.findByIdAndDelete(req.params.id)
+      console.log()
+      if (user) {
+        res.status(200).end()
+      } else {
+        res.status(404).end()
       }
     } catch (error) {
       console.log(error)
