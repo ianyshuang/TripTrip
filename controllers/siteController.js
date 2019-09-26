@@ -101,17 +101,17 @@ const siteController = {
       }
       if (site.collectingUsers.includes(user.id)) {
         const userIndex = site.collectingUsers.findIndex(id => id === user.id)
-        const siteIndex = user.collectedSites.findIndex(id => id === site.placeId)
+        const siteIndex = user.collectingSites.findIndex(id => id === site.placeId)
         site.collectingUsers.splice(userIndex, 1)
         site.collectingCounts -= 1
-        user.collectedSites.splice(siteIndex, 1)
+        user.collectingSites.splice(siteIndex, 1)
       } else {
         site.collectingCounts += 1
         site.collectingUsers.push(user.id)
-        user.collectedSites.push(site.placeId)
+        user.collectingSites.push(site.placeId)
       }
       site.markModified('collectingUsers')
-      user.markModified('collectedSites')
+      user.markModified('collectingSites')
       site.save()
       user.save()
       res.status(200).end()

@@ -61,9 +61,7 @@ const userController = {
         data.collectingTrips = await Trip.find({ _id: { $in: data.collectingTrips } })
         data.owningTrips = await Trip.find({ _id: { $in: data.owningTrips } })
         data.ratingTrips = await Trip.find({ _id: { $in: data.ratingTrips } })
-        data.collectedSites = await Site.find({
-          placeId: { $in: data.collectedSites }
-        })
+        data.collectingSites = await Site.find({ placeId: { $in: data.collectingSites } })
         res.status(200).send(data)
       }
     } catch (error) {
@@ -191,7 +189,8 @@ const userController = {
     try {
       const users = await User.find({})
       const data = users.map(user => ({
-        name: user.username,
+        id: user.id,
+        username: user.username,
         email: user.email,
         collectingTrips: user.collectingTrips.length,
         collectedTrips: user.collectedTrips.length
@@ -205,12 +204,22 @@ const userController = {
   async deleteUser (req, res) {
     try {
       const user = await User.findByIdAndDelete(req.params.id)
-      console.log()
-      if (user) {
-        res.status(200).end()
-      } else {
+      if (!user) {
         res.status(404).end()
+        return
       }
+      await Trip.deleteMany({ userId: user.id }) // 將該使用者的行程刪除
+      // 從所有該使用者收藏行程中的 collectingUsers 中將其 userId 刪除
+      const trips = await Trip.find({ collectingUsers: user.id })
+      if (trips.length !== 0) {
+        trips.forEach(trip => {
+          trip.collectingCounts -= 1
+          const index = trip.collectingUsers.findIndex(id => id === user.id)
+          trip.collectingUsers.splice(index, 1)
+          trip.save()
+        })
+      }
+      res.status(200).end()
     } catch (error) {
       console.log(error)
       res.status(500).end()

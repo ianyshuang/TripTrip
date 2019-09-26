@@ -227,8 +227,6 @@ const tripController = {
       const trip = await Trip.findById(req.params.id)
       const userCollecting = await User.findById(req.user.id)
       const userCollected = await User.findById(trip.userId)
-      console.log(userCollecting)
-      console.log(userCollected)
       // trip 不存在
       if (!trip) {
         res.status(404).end()
