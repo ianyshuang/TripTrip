@@ -13,6 +13,19 @@ async function uploadImages (paths) {
   return imgLinks
 }
 
+function sortCommentAndReply(trip) {
+  trip.comments.sort((prev, next) => {
+    return (new Date(next.date) - new Date(prev.date))
+  })
+  trip.comments.forEach(comment => {
+    if (comment.replies) {
+      comment.replies.sort((prev, next) => {
+        return (new Date(next.date) - new Date(prev.date))
+      })
+    }
+  })
+}
+
 const tripController = {
   async getPopularTrips (req, res) {
     try {
@@ -31,6 +44,7 @@ const tripController = {
         res.status(404).end()
         return
       }
+      sortCommentAndReply(trip) // 將 comment, reply 從最新排到最舊
       res.status(200).send(trip)
     } catch (error) {
       console.log(error)
@@ -39,35 +53,24 @@ const tripController = {
   },
   async getTripByCountryAndCities (req, res) {
     const { cities, country } = req.query
-    if (cities) {
-      try {
-        const trips = await Trip.find({
-          cities: { $in: cities }
-        })
-        res.status(200).send(trips)
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
+    let trips = []
+    try {
+      if (cities && cities.length !== 0) {
+        trips = await Trip.find({ cities: { $in: cities } })
+      } else if (country) {
+        trips = await Trip.find({ country: country })
+      } else {
+        trips = await Trip.find({})
       }
-    } else if (country) {
-      try {
-        const trips = await Trip.find({
-          country: country
-        })
-        res.status(200).send(trips)
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
-      }
-    } else {
-      try {
-        const trips = await Trip.find({})
-        res.status(200).send(trips)
-      } catch (error) {
-        console.log(error)
-        res.status(500).end()
-      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
     }
+    trips.forEach(trip => {
+      sortCommentAndReply(trip) // 將 comment, reply 從最新排到最舊
+    })
+    res.status(200).send(trips)
+    
   },
   async getTripsByKeyword (req, res) {
     let { keyword } = req.query
@@ -94,6 +97,9 @@ const tripController = {
         })
         .sort({ rating: -1 })
         .toArray()
+      trips.forEach(trip => {
+        sortCommentAndReply(trip)
+      })
       res.status(200).send(trips)
       client.close()
     } catch (error) {
@@ -234,7 +240,7 @@ const tripController = {
       }
       // 不可收藏自己的 trip
       if (String(trip.userId) === req.user.id) {
-        res.status(400).end()
+        res.status(403).end()
         return
       }
       // 以收藏則取消收藏，反之則加入收藏
@@ -302,6 +308,10 @@ const tripController = {
         res.status(404).end()
         return
       }
+      if (String(trip.userId) === req.user.id) {
+        res.status(403).end()
+        return
+      }
       const userRatingObject = user.ratingTrips.find(trip => trip.id === req.params.id)
       if (!userRatingObject) {
         trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
@@ -346,7 +356,7 @@ const tripController = {
           text: text
         }
         message = newComment
-        trip.comments.push(newComment)
+        trip.comments.unshift(newComment)
       } else if (!text) {
         const commentIndex = trip.comments.findIndex(comment => comment.id === commentId)
         if (commentIndex === -1) {
@@ -403,7 +413,7 @@ const tripController = {
         if (!comment.replies) {
           comment.replies = []
         }
-        comment.replies.push(newReply)
+        comment.replies.unshift(newReply)
       } else if (!text) {
         const replyIndex = comment.replies.findIndex(reply => reply.id === replyId)
         if (replyIndex === -1) {

@@ -58,10 +58,11 @@ const userController = {
         return
       } else {
         const data = { ...user._doc }
-        data.collectingTrips = await Trip.find({ _id: { $in: data.collectingTrips } })
-        data.owningTrips = await Trip.find({ _id: { $in: data.owningTrips } })
-        data.ratingTrips = await Trip.find({ _id: { $in: data.ratingTrips } })
+        ratingTripsId = data.ratingTrips.map(trip => trip.id)
+        data.collectingTrips = await Trip.find({ id: { $in: data.collectingTrips } })
         data.collectingSites = await Site.find({ placeId: { $in: data.collectingSites } })
+        data.owningTrips = await Trip.find({ userId: user.id })
+        data.ratingTrips = await Trip.find({ id: { $in: ratingTripsId } })
         res.status(200).send(data)
       }
     } catch (error) {

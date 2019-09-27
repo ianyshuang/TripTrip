@@ -34,10 +34,6 @@ const userSchema = new Schema(
       type: Boolean,
       default: false
     },
-    owningTrips: {
-      type: [Schema.Types.ObjectId],
-      default: []
-    },
     collectedTrips: {
       type: [Schema.Types.ObjectId],
       default: []

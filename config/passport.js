@@ -40,8 +40,8 @@ passport.use(
 let facebookCallback = ''
 let googleCallback = ''
 if (process.env.NODE_ENV === 'production') {
-  facebookCallback = 'https://triptrip-backend.herokuapp.com/facebook/redirect'
-  googleCallback = 'https://triptrip-backend.herokuapp.com/google/redirect'
+  facebookCallback = process.env.BASE_URL + '/facebook/redirect'
+  googleCallback = process.env.BASE_URL + '/google/redirect'
 } else {
   facebookCallback = 'http://localhost:3000/facebook/redirect'
   googleCallback = 'http://localhost:3000/google/redirect'
@@ -69,14 +69,14 @@ passport.use(
             .toString(36)
             .slice(-8)
           const newUser = await User.create({
-            username: profile.displayName ? profile.displayName : ' ',
+            username: profile.displayName || ' ',
             email: profile._json.email,
             password: bcrypt.hashSync(
               randomPassword,
               bcrypt.genSaltSync(10),
               null
             ),
-            avatar: profile.photos[0].value ? profile.photos[0].value : null,
+            avatar: profile.photos[0].value || process.env.BASE_URL + '/img/user.png',
             accountType: 'facebook'
           })
           return done(null, newUser)
@@ -110,14 +110,14 @@ passport.use(
             .toString(36)
             .slice(-8)
           const newUser = await User.create({
-            username: profile.displayName ? profile.displayName : ' ',
+            username: profile.displayName || ' ',
             email: profile._json.email,
             password: bcrypt.hashSync(
               randomPassword,
               bcrypt.genSaltSync(10),
               null
             ),
-            avatar: profile.picture ? profile.picture : null,
+            avatar: profile._json.picture || process.env.BASE_URL + '/img/user.png',
             accountType: 'google'
           })
           return done(null, newUser)

@@ -11,7 +11,7 @@ router.get(
       if (err) { return res.redirect('http://localhost:8080/#/redirect?error=true') }
       if (Object.keys(info).length !== 0) {
         return res.redirect(
-          `http://localhost:8080#/redirect?status=${info.status}`
+          `http://localhost:8080/#/redirect?status=${info.status}`
         )
       }
       req.logIn(user, { session: false }, (err) => {
