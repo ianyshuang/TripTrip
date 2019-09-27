@@ -225,6 +225,14 @@ const userController = {
       console.log(error)
       res.status(500).end()
     }
+  },
+  deleteToken (req, res) {
+    try {
+      res.clearCookie('token')
+      res.status(200).end()
+    } catch (error) {
+      res.status(500).end()
+    }
   }
 }
 
