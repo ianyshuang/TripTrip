@@ -131,11 +131,11 @@ const siteController = {
   },
   async deleteSite (req, res) {
     try {
-      const site = await Site.findByIdAndDelete(req.params.id)
-      if (site) {
-        res.status(200).end()
-      } else {
+      const site = await Site.findOneAndDelete({ placeId: req.params.id })
+      if (!site) {
         res.status(404).end()
+      } else {
+        res.status(200).end()
       }
     } catch (error) {
       console.log(error)

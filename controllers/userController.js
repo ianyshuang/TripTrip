@@ -188,15 +188,8 @@ const userController = {
   },
   async getUsers (req, res) {
     try {
-      const users = await User.find({})
-      const data = users.map(user => ({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        collectingTrips: user.collectingTrips.length,
-        collectedTrips: user.collectedTrips.length
-      }))
-      res.status(200).send(data)
+      const users = await User.find({}).select('-password')
+      res.status(200).send(users)
     } catch (error) {
       console.log(error)
       res.status(500).end()

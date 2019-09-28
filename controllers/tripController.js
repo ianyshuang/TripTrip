@@ -27,7 +27,7 @@ function sortCommentAndReply(trip) {
 }
 
 const tripController = {
-  async getPopularTrips (req, res) {
+  async getPopularTrips(req, res) {
     try {
       const trips = await Trip.find({}).sort({ collectingCounts: -1 })
       const popularTrips = trips.slice(0, 4)
@@ -37,7 +37,7 @@ const tripController = {
       res.status(404).end()
     }
   },
-  async getTrip (req, res) {
+  async getTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       if (!trip) {
@@ -51,7 +51,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async getTripByCountryAndCities (req, res) {
+  async getTripByCountryAndCities(req, res) {
     const { cities, country } = req.query
     let trips = []
     try {
@@ -70,9 +70,8 @@ const tripController = {
       sortCommentAndReply(trip) // 將 comment, reply 從最新排到最舊
     })
     res.status(200).send(trips)
-    
   },
-  async getTripsByKeyword (req, res) {
+  async getTripsByKeyword(req, res) {
     let { keyword } = req.query
     if (keyword.includes('臺')) {
       keyword = keyword.replace('臺', '台')
@@ -89,7 +88,13 @@ const tripController = {
         .find({
           $or: [
             { name: { $regex: regex } },
-            { contents: { $elemMatch: { activities: { $elemMatch: { name: { $regex: regex } } } } } },
+            {
+              contents: {
+                $elemMatch: {
+                  activities: { $elemMatch: { name: { $regex: regex } } }
+                }
+              }
+            },
             { sites: { $elemMatch: { $elemMatch: { $in: [regex] } } } },
             { country: keyword },
             { cities: keyword }
@@ -107,7 +112,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async createTrip (req, res) {
+  async createTrip(req, res) {
     const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     const data = JSON.parse(body.data)
@@ -151,7 +156,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async updateTrip (req, res) {
+  async updateTrip(req, res) {
     const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     const data = JSON.parse(body.data)
@@ -215,20 +220,24 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async deleteTrip (req, res) {
+  async deleteTrip(req, res) {
     try {
-      const trip = await Trip.findByIdAndDelete(req.params.id)
+      const trip = await Trip.findById(req.params.id)
       if (!trip) {
         res.status(404).end()
         return
+      } else if (String(trip.userId) !== req.user.id) {
+        res.status(403).end()
+      } else {
+        trip.remove()
+        res.status(200).end()
       }
-      res.status(200).end()
     } catch (error) {
       console.log(error)
       res.status(500).end()
     }
   },
-  async toggleCollectingTrip (req, res) {
+  async toggleCollectingTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       const userCollecting = await User.findById(req.user.id)
@@ -245,12 +254,18 @@ const tripController = {
       }
       // 以收藏則取消收藏，反之則加入收藏
       if (trip.collectingUsers.includes(req.user.id)) {
-        const userCollectingIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
+        const userCollectingIndex = trip.collectingUsers.findIndex(
+          id => id === req.user.id
+        )
         trip.collectingUsers.splice(userCollectingIndex, 1)
         trip.collectingCounts -= 1
-        const tripCollectingIndex = userCollecting.collectingTrips.findIndex(id => id === trip.id)
+        const tripCollectingIndex = userCollecting.collectingTrips.findIndex(
+          id => id === trip.id
+        )
         userCollecting.collectingTrips.splice(tripCollectingIndex, 1)
-        const tripCollectedIndex = userCollected.collectedTrips.findIndex(id => id === trip.id)
+        const tripCollectedIndex = userCollected.collectedTrips.findIndex(
+          id => id === trip.id
+        )
         userCollected.collectedTrips.splice(tripCollectedIndex, 1)
       } else {
         trip.collectingUsers.push(req.user.id)
@@ -271,7 +286,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async forkTrip (req, res) {
+  async forkTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
       if (!trip) {
@@ -295,7 +310,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async rateTrip (req, res) {
+  async rateTrip(req, res) {
     const { rating } = req.body
     if (!rating) {
       res.status(400).send('未傳送評分！')
@@ -312,16 +327,21 @@ const tripController = {
         res.status(403).end()
         return
       }
-      const userRatingObject = user.ratingTrips.find(trip => trip.id === req.params.id)
+      const userRatingObject = user.ratingTrips.find(
+        trip => trip.id === req.params.id
+      )
       if (!userRatingObject) {
-        trip.rating = (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
+        trip.rating =
+          (trip.rating * trip.ratingCounts + rating) / (trip.ratingCounts + 1)
         trip.ratingCounts += 1
         user.ratingTrips.push({
           id: req.params.id,
           userRating: rating
         })
       } else {
-        trip.rating = (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) / trip.ratingCounts
+        trip.rating =
+          (trip.rating * trip.ratingCounts - userRatingObject.rating + rating) /
+          trip.ratingCounts
         userRatingObject.userRating = rating
       }
       user.markModified('ratingTrips')
@@ -333,7 +353,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async handleTripComment (req, res) {
+  async handleTripComment(req, res) {
     const { text, commentId } = req.body
     let message = {}
     if (!text && !commentId) {
@@ -358,7 +378,9 @@ const tripController = {
         message = newComment
         trip.comments.unshift(newComment)
       } else if (!text) {
-        const commentIndex = trip.comments.findIndex(comment => comment.id === commentId)
+        const commentIndex = trip.comments.findIndex(
+          comment => comment.id === commentId
+        )
         if (commentIndex === -1) {
           res.status(404).send('無此評論')
           return
@@ -381,7 +403,7 @@ const tripController = {
       res.status(500).end()
     }
   },
-  async handleTripReply (req, res) {
+  async handleTripReply(req, res) {
     const { text, replyId } = req.body
     let message = {}
     if (!text && !replyId) {
@@ -390,7 +412,9 @@ const tripController = {
     }
     try {
       const trip = await Trip.findById(req.params.id)
-      const comment = trip.comments.find(comment => comment.id === req.params.commentId)
+      const comment = trip.comments.find(
+        comment => comment.id === req.params.commentId
+      )
       if (!trip) {
         res.status(404).send('無此行程')
         return
@@ -415,7 +439,9 @@ const tripController = {
         }
         comment.replies.unshift(newReply)
       } else if (!text) {
-        const replyIndex = comment.replies.findIndex(reply => reply.id === replyId)
+        const replyIndex = comment.replies.findIndex(
+          reply => reply.id === replyId
+        )
         if (replyIndex === -1) {
           res.status(404).send('無此回覆')
           return
@@ -433,6 +459,28 @@ const tripController = {
       trip.markModified('comments')
       trip.save()
       res.status(200).send(message)
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async adminDeleteTrip(req, res) {
+    try {
+      const trip = await Trip.findByIdAndDelete(req.params.id)
+      if (!trip) {
+        res.status(404).end()
+      } else {
+        res.status(200).end()
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end()
+    }
+  },
+  async getTrips(req, res) {
+    try {
+      const trips = await Trip.find({})
+      res.status(200).send(trips)
     } catch (error) {
       console.log(error)
       res.status(500).end()
