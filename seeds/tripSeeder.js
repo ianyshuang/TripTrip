@@ -25,6 +25,7 @@ db.once('open', () => {
           return {
             ...trip,
             userId: users[index1].id,
+            ownername: users[index1].username,
             comments: [
               {
                 id:

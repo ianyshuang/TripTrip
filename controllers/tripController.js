@@ -145,6 +145,7 @@ const tripController = {
     try {
       const trip = await Trip.create({
         userId: req.user.id,
+        ownername: req.user.username,
         days: data.sites.length,
         ...data,
         images: imgLinks,
@@ -160,7 +161,7 @@ const tripController = {
     const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     const data = JSON.parse(body.data)
-    const deletedImages = data.deletedImages ? data.deletedImages : []
+    const deletedImages = data.deletedImages || []
     delete data['deletedImages'] // 從 data 拿掉以免加進去原本 trip 的屬性
 
     // 整理 data 格式 (Postman 才需要，axios 不用)
@@ -254,18 +255,12 @@ const tripController = {
       }
       // 以收藏則取消收藏，反之則加入收藏
       if (trip.collectingUsers.includes(req.user.id)) {
-        const userCollectingIndex = trip.collectingUsers.findIndex(
-          id => id === req.user.id
-        )
+        const userCollectingIndex = trip.collectingUsers.findIndex(id => id === req.user.id)
         trip.collectingUsers.splice(userCollectingIndex, 1)
         trip.collectingCounts -= 1
-        const tripCollectingIndex = userCollecting.collectingTrips.findIndex(
-          id => id === trip.id
-        )
+        const tripCollectingIndex = userCollecting.collectingTrips.findIndex(id => id === trip.id)
         userCollecting.collectingTrips.splice(tripCollectingIndex, 1)
-        const tripCollectedIndex = userCollected.collectedTrips.findIndex(
-          id => id === trip.id
-        )
+        const tripCollectedIndex = userCollected.collectedTrips.findIndex(id => id === trip.id)
         userCollected.collectedTrips.splice(tripCollectedIndex, 1)
       } else {
         trip.collectingUsers.push(req.user.id)

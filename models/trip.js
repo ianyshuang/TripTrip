@@ -11,6 +11,10 @@ const tripSchema = new Schema({
     index: true,
     required: true
   },
+  ownername: {
+    type: String,
+    required: true
+  },
   days: {
     type: Number,
     default: 1
