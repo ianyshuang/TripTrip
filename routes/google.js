@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const passport = require('passport')
 const issueToken = require('../utils/issue_token')
-const redirectBaseUrl = process.env.NODE_ENV === 'production' ? 'https://triptrip-backend.herokuapp.com' : 'http://localhost:8080/#/'
+const redirectBaseUrl = process.env.NODE_ENV === 'production' ? 'https://triptrip-backend.herokuapp.com/#' : 'http://localhost:8080/#'
 
 router.get('/', passport.authenticate('google', { scope: ['profile', 'email'], session: false }))
 router.get(
