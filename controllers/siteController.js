@@ -75,7 +75,8 @@ const siteController = {
         useNewUrlParser: true,
         useUnifiedTopology: true
       })
-      const db = client.db('trip-planer')
+      const dbName = process.env.MONGODB_URI ? 'heroku_2g6t7nh8' : 'trip-planer'
+      const db = client.db(dbName)
       const trips = await db
         .collection('trips')
         .find({
