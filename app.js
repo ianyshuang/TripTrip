@@ -17,11 +17,16 @@ const db = mongoose.connection
 
 // 使用設定
 const corsOptions = {
-  origin: ['http://localhost:8080'],
+  origin: [
+    'http://localhost:8080',
+    'http://localhost:3000',
+    'https://triptrip-backend.herokuapp.com'
+  ],
   credentials: true,
   maxAge: 1728000
 }
 app.use(cors(corsOptions))
+app.use(express.static('dist'))
 app.use(bodyParser.json())
 app.use(passport.initialize())
 app.use(cookieParser())

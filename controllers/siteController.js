@@ -34,7 +34,6 @@ const siteController = {
       for (const city of cities) {
         regexArray.push(new RegExp(city, 'i'))
       }
-      console.log(regexArray)
       try {
         const sites = await Site.find({
           city: { $in: regexArray }
