@@ -24,7 +24,7 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
-      default: null
+      default: '/img/user.png'
     },
     createdAt: {
       type: Date,
