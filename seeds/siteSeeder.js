@@ -43,6 +43,7 @@ db.once('open', () => {
       Site.insertMany(sites)
         .then(() => {
           console.log('successfully writing seed data')
+          process.exit(0)
         })
         .catch(error => {
           console.log(error)

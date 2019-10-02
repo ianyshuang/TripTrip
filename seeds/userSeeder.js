@@ -24,6 +24,7 @@ db.once('open', () => {
       User.insertMany(users)
         .then(users => {
           console.log('successfully writing seed data')
+          process.exit(0)
         })
         .catch(error => {
           console.log(error)

@@ -10,7 +10,8 @@
     "lint": "eslint --ext .js --fix .",
     "userSeeds": "node seeds/userSeeder.js",
     "siteSeeds": "node seeds/siteSeeder.js",
-    "tripSeeds": "node seeds/tripSeeder.js"
+    "tripSeeds": "node seeds/tripSeeder.js",
+    "admin": "node seeds/createAdmin.js"
   },
   "keywords": [],
   "author": "",

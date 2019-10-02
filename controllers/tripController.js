@@ -29,7 +29,7 @@ function sortCommentAndReply(trip) {
 const tripController = {
   async getPopularTrips(req, res) {
     try {
-      const trips = await Trip.find({}).sort({ collectingCounts: -1 })
+      const trips = await Trip.find({}).populate('userId', 'username').sort({ collectingCounts: -1 })
       const popularTrips = trips.slice(0, 4)
       res.status(200).send(popularTrips)
     } catch (error) {
@@ -39,7 +39,7 @@ const tripController = {
   },
   async getTrip(req, res) {
     try {
-      const trip = await Trip.findById(req.params.id)
+      const trip = await Trip.findById(req.params.id).populate('userId', 'username') // 將 userId 這個 foreign key 欄位關聯並填充 User 的 username
       if (!trip) {
         res.status(404).end()
         return
@@ -56,12 +56,13 @@ const tripController = {
     let trips = []
     try {
       if (cities && cities.length !== 0) {
-        trips = await Trip.find({ cities: { $in: cities } })
+        trips = await Trip.find({ cities: { $in: cities } }).populate('userId', 'username')
       } else if (country) {
-        trips = await Trip.find({ country: country })
+        trips = await Trip.find({ country: country }).populate('userId', 'username')
       } else {
-        trips = await Trip.find({})
+        trips = await Trip.find({}).populate('userId', 'username')
       }
+      
     } catch (error) {
       console.log(error)
       res.status(500).end()
@@ -106,6 +107,10 @@ const tripController = {
       trips.forEach(trip => {
         sortCommentAndReply(trip)
       })
+      for (let trip of trips) {
+        const user = await User.findById(String(trip.userId))
+        trip.ownername = user.username
+      }
       res.status(200).send(trips)
       client.close()
     } catch (error) {
@@ -146,7 +151,6 @@ const tripController = {
     try {
       const trip = await Trip.create({
         userId: req.user.id,
-        ownername: req.user.username,
         days: data.sites.length,
         ...data,
         images: imgLinks,
@@ -162,6 +166,7 @@ const tripController = {
     const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     const data = JSON.parse(body.data)
+    console.log(data)
     const deletedImages = data.deletedImages || []
     delete data['deletedImages'] // 從 data 拿掉以免加進去原本 trip 的屬性
 
@@ -180,6 +185,10 @@ const tripController = {
       let trip = await Trip.findById(req.params.id)
       if (!trip) {
         res.status(404).end()
+        return
+      }
+      if (String(trip.userId) !== req.user.id) {
+        res.status(403).end()
         return
       }
       // 上傳圖片並得到回傳的URL
@@ -215,7 +224,7 @@ const tripController = {
       trip.markModified('contents')
       trip.markModified('sites')
       trip.markModified('comments')
-      trip.save()
+      trip.update()
       res.status(200).end()
     } catch (error) {
       console.log(error)

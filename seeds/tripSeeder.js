@@ -25,7 +25,6 @@ db.once('open', () => {
           return {
             ...trip,
             userId: users[index1].id,
-            ownername: users[index1].username,
             comments: [
               {
                 id:
@@ -60,6 +59,7 @@ db.once('open', () => {
         Trip.insertMany(trips)
           .then(trips => {
             console.log('successfully writing seed data')
+            process.exit(0)
           })
           .catch(error => {
             console.log(error)
