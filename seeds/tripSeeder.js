@@ -24,7 +24,7 @@ db.once('open', () => {
           const index4 = Math.floor(Math.random() * 10)
           return {
             ...trip,
-            userId: users[index1].id,
+            userId: users[index1]._id,
             comments: [
               {
                 id:

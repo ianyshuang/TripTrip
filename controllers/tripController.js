@@ -39,7 +39,7 @@ const tripController = {
   },
   async getTrip(req, res) {
     try {
-      const trip = await Trip.findById(req.params.id).populate('userId', 'username') // 將 userId 這個 foreign key 欄位關聯並填充 User 的 username
+      const trip = await Trip.findById(req.params.id).populate('userId', 'username') // 用 userId 去 user 參照，並取回 username 這個欄位
       if (!trip) {
         res.status(404).end()
         return
@@ -166,7 +166,6 @@ const tripController = {
     const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     const data = JSON.parse(body.data)
-    console.log(data)
     const deletedImages = data.deletedImages || []
     delete data['deletedImages'] // 從 data 拿掉以免加進去原本 trip 的屬性
 
@@ -204,7 +203,12 @@ const tripController = {
         }
       }
       // 將除圖片外的所有屬性更新
-      trip = Object.assign(trip, data)
+      const notEditableFields = ['days', 'rating', 'ratingCounts', 'images', 'collectingCounts', 'collectingUsers', '_id', 'userId', '__v', 'comments']
+      for (let field of notEditableFields) {
+        delete data[field]
+      }
+      Object.assign(trip, data)
+      trip.days = trip.sites.length
       // 刪除舊圖片
       if (deletedImages.length !== 0) {
         deletedImages.forEach(image => {
@@ -224,7 +228,7 @@ const tripController = {
       trip.markModified('contents')
       trip.markModified('sites')
       trip.markModified('comments')
-      trip.update()
+      trip.save()
       res.status(200).end()
     } catch (error) {
       console.log(error)
