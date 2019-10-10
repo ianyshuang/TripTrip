@@ -39,7 +39,7 @@ const userController = {
   },
   async getUser (req, res) {
     try {
-      const user = await User.findById(req.user.id).select('-password')
+      const user = await User.findById(req.user._id).select('-password')
       if (!user) {
         res.status(404).end()
         return
@@ -59,12 +59,13 @@ const userController = {
       } else {
         const data = { ...user._doc }
         ratingTripsId = data.ratingTrips.map(trip => trip.id)
-        data.collectingTrips = await Trip.find({ id: { $in: data.collectingTrips } })
+        data.collectingTrips = await Trip.find({ _id: { $in: data.collectingTrips } })
         data.collectingSites = await Site.find({ placeId: { $in: data.collectingSites } })
-        data.owningTrips = await Trip.find({ userId: user.id })
-        data.ratingTrips = await Trip.find({ id: { $in: ratingTripsId } })
+        data.owningTrips = await Trip.find({ userId: user._id })
+        data.ratingTrips = await Trip.find({ _id: { $in: ratingTripsId } })
         res.status(200).send(data)
       }
+      res.status(200).send({ original: user, obj: userObj })
     } catch (error) {
       console.log(error)
       res.status(500).end()
@@ -99,7 +100,7 @@ const userController = {
       }
     }
     try {
-      const user = await User.findById(req.user.id)
+      const user = await User.findById(req.user._id)
       user.username = username || user.username
       user.password = password
         ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
@@ -202,13 +203,13 @@ const userController = {
         res.status(404).end()
         return
       }
-      await Trip.deleteMany({ userId: user.id }) // 將該使用者的行程刪除
+      await Trip.deleteMany({ userId: user._id }) // 將該使用者的行程刪除
       // 從所有該使用者收藏行程中的 collectingUsers 中將其 userId 刪除
-      const trips = await Trip.find({ collectingUsers: user.id })
+      const trips = await Trip.find({ collectingUsers: user._id })
       if (trips.length !== 0) {
         trips.forEach(trip => {
           trip.collectingCounts -= 1
-          const index = trip.collectingUsers.findIndex(id => id === user.id)
+          const index = trip.collectingUsers.findIndex(id => id === user._id)
           trip.collectingUsers.splice(index, 1)
           trip.save()
         })

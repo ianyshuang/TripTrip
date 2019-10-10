@@ -13,6 +13,11 @@ TripTrip 是一個讓你能輕鬆、快速規劃行程的工具。
 
 ![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)[](https://github.com/feross/standard)
 
+## Complete
+
+
+## In Progress
+
 ## Installation
 
 首先，切換至欲存放專案的資料夾，並輸入

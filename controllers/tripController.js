@@ -45,7 +45,10 @@ const tripController = {
         return
       }
       sortCommentAndReply(trip) // 將 comment, reply 從最新排到最舊
-      res.status(200).send(trip)
+      data = { ...trip._doc } // 原本的 trip 為 strict mode，不可刪除或添加屬性，必須建立一個新的 object
+      data.username = trip.userId.username
+      data.userId = trip.userId._id
+      res.status(200).send(data)
     } catch (error) {
       console.log(error)
       res.status(500).end()
@@ -62,7 +65,6 @@ const tripController = {
       } else {
         trips = await Trip.find({}).populate('userId', 'username')
       }
-      
     } catch (error) {
       console.log(error)
       res.status(500).end()
@@ -70,7 +72,13 @@ const tripController = {
     trips.forEach(trip => {
       sortCommentAndReply(trip) // 將 comment, reply 從最新排到最舊
     })
-    res.status(200).send(trips)
+    // 原本的 trips 為 strict mode，不可刪除或添加屬性，必須建立一個新的 object
+    data = trips.map(trip => ({
+      ...trip._doc,
+      username: trip.userId.username,
+      userId: trip.userId._id
+    }))
+    res.status(200).send(data)
   },
   async getTripsByKeyword(req, res) {
     let { keyword } = req.query
@@ -109,7 +117,7 @@ const tripController = {
       })
       for (let trip of trips) {
         const user = await User.findById(String(trip.userId))
-        trip.ownername = user.username
+        trip.username = user.username
       }
       res.status(200).send(trips)
       client.close()
@@ -150,7 +158,7 @@ const tripController = {
     // 新增行程
     try {
       const trip = await Trip.create({
-        userId: req.user.id,
+        userId: req.user._id,
         days: data.sites.length,
         ...data,
         images: imgLinks,
@@ -202,7 +210,7 @@ const tripController = {
           res.status(500).end()
         }
       }
-      // 將除圖片外的所有屬性更新
+      // 將屬性更新(剔除不可由 update 直接變更的屬性)
       const notEditableFields = ['days', 'rating', 'ratingCounts', 'images', 'collectingCounts', 'collectingUsers', '_id', 'userId', '__v', 'comments']
       for (let field of notEditableFields) {
         delete data[field]
@@ -255,7 +263,7 @@ const tripController = {
   async toggleCollectingTrip(req, res) {
     try {
       const trip = await Trip.findById(req.params.id)
-      const userCollecting = await User.findById(req.user.id)
+      const userCollecting = await User.findById(req.user._id)
       const userCollected = await User.findById(trip.userId)
       // trip 不存在
       if (!trip) {
@@ -302,10 +310,11 @@ const tripController = {
         res.status(404).end()
         return
       }
-      const { name, days, country, cities, contents, sites } = trip
+      const { name, days, country, cities, contents, sites, startDate } = trip
       const newTrip = await Trip.create({
-        userId: req.user.id,
+        userId: req.user._id,
         isPrivate: false,
+        startDate,
         name,
         days,
         country,
@@ -379,7 +388,7 @@ const tripController = {
         const newComment = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
-          userId: req.user.id,
+          userId: req.user._id,
           username: req.user.username,
           userAvatar: req.user.avatar,
           text: text
@@ -436,7 +445,7 @@ const tripController = {
         const newReply = {
           id: req.user.id + new Date().getTime(),
           date: new Date(),
-          userId: req.user.id,
+          userId: req.user._id,
           username: req.user.username,
           userAvatar: req.user.avatar,
           text: req.body.text

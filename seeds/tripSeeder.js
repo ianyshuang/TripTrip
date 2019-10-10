@@ -27,27 +27,23 @@ db.once('open', () => {
             userId: users[index1]._id,
             comments: [
               {
-                id:
-                  users[index2].id + new Date(trip.comments[0].date).getTime(),
+                id: users[index2].id + new Date(trip.comments[0].date).getTime(),
                 date: trip.comments[0].date,
                 text: trip.comments[0].text,
-                userId: users[index2].id,
+                userId: users[index2]._id,
                 username: users[index2].username,
                 replies: [
                   {
-                    id:
-                      users[index3].id +
-                      new Date(trip.comments[0].replies[0].date).getTime(),
+                    id: users[index3]._id + new Date(trip.comments[0].replies[0].date).getTime(),
                     date: trip.comments[0].replies[0].date,
                     text: trip.comments[0].replies[0].text,
-                    userId: users[index3].id,
+                    userId: users[index3]._id,
                     username: users[index3].username
                   }
                 ]
               },
               {
-                id:
-                  users[index4].id + new Date(trip.comments[1].date).getTime(),
+                id: users[index4].id + new Date(trip.comments[1].date).getTime(),
                 date: trip.comments[1].date,
                 text: trip.comments[1].text,
                 userId: users[index4].id,
@@ -57,7 +53,7 @@ db.once('open', () => {
           }
         })
         Trip.insertMany(trips)
-          .then(trips => {
+          .then(() => {
             console.log('successfully writing seed data')
             process.exit(0)
           })

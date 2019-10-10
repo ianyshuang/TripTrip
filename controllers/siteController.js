@@ -77,14 +77,41 @@ const siteController = {
       })
       const dbName = process.env.MONGODB_URI ? 'heroku_2g6t7nh8' : 'trip-planer'
       const db = client.db(dbName)
-      const trips = await db
+      const containingTrips = await db
         .collection('trips')
         .find({
           sites: { $elemMatch: { $elemMatch: { $in: [site.name] } } }
         })
         .sort({ collectingCounts: -1 })
         .toArray()
-      res.status(200).send({ site, trips })
+      if (containingTrips.length !== 0) {
+        res.status(200).send({ site, containingTrips })
+      } else {
+        const otherSites = []
+        const sameCitySites = await Site.find({ city: site.city }).sort({ collectingCounts: -1 }) // 將同縣市的景點找出並依收藏數排序
+        sameCitySites.forEach(site => {
+          if (site.placeId !== req.params.placeId) otherSites.push(site._doc.name) // 將景點名稱放到 otherSites 裡面
+        })
+        const otherTrips = []
+        // 當行程少於三個，就一直用這些同縣市的景點去找行程
+        for (let site of otherSites) {
+          if (otherTrips.length < 3) {
+            let trips = await db
+              .collection('trips')
+              .find({
+                sites: { $elemMatch: { $elemMatch: { $in: [site] } } }
+              })
+              .toArray()
+            trips.forEach(trip => {
+              otherTrips.push({
+                ...trip,
+                site: site
+              })
+            })
+          }
+        }
+        res.status(200).send({ site, otherTrips })
+      }
       client.close()
     } catch (error) {
       console.log(error)
@@ -94,7 +121,7 @@ const siteController = {
   async toggleCollectingSite (req, res) {
     try {
       const site = await Site.findOne({ placeId: req.params.placeId })
-      const user = await User.findById(req.user.id)
+      const user = await User.findById(req.user._id)
       if (!site) {
         res.status(404).end()
         return

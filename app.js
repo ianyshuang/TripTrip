@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const passport = require('./config/passport')
 // 跟 mongodb 連線
-mongoose.connect(dbpath, { useNewUrlParser: true, useCreateIndex: true })
+mongoose.connect(dbpath, { useNewUrlParser: true, useCreateIndex: true , useUnifiedTopology: true })
 const db = mongoose.connection
 
 // 使用設定
