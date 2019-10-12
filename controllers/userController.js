@@ -43,8 +43,11 @@ const userController = {
       if (!user) {
         res.status(404).end()
         return
+      } else {
+        const data = { ...user._doc }
+        data.owningTrips = await Trip.find({ userId: user._id })
+        res.status(200).send(data)
       }
-      res.status(200).send(user)
     } catch (error) {
       console.log(error)
       res.status(500)
@@ -65,7 +68,6 @@ const userController = {
         data.ratingTrips = await Trip.find({ _id: { $in: ratingTripsId } })
         res.status(200).send(data)
       }
-      res.status(200).send({ original: user, obj: userObj })
     } catch (error) {
       console.log(error)
       res.status(500).end()
@@ -77,8 +79,11 @@ const userController = {
       if (!user) {
         res.status(404).end()
         return
+      } else {
+        const data = { ...user._doc }
+        data.owningTrips = await Trip.find({ userId: user._id })
+        res.status(200).send(data)
       }
-      res.status(200).send(user)
     } catch (error) {
       console.log(error)
       res.status(500).end()

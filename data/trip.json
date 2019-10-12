@@ -13,12 +13,14 @@
             {
               "name": "秀姑巒溪遊客中心",
               "cost": 800,
+              "placeId": "ChIJ-8aNc39FbzQRh1tWBgRDZWc",
               "startTime": "2019-01-01 10:30:00",
               "endTime": "2019-01-01 15:00:00"
             },
             {
               "name": "東大門夜市",
               "cost": 300,
+              "placeId": "ChIJKQxO8emfaDQR5SAKaOCWeb4",
               "startTime": "2019-01-01 18:00:00",
               "endTime": "2019-01-01 19:00:00"
             }
@@ -30,12 +32,14 @@
             {
               "name": "六十石山金針花海",
               "cost": 0,
+              "placeId": "ChIJKTUhPFxsbzQR8No95MV8Ipg",
               "startTime": "2019-01-02 10:00:00",
               "endTime": "2019-01-02 14:00:00"
             },
             {
               "name": "七星潭海岸風景特定區",
               "cost": 100,
+              "placeId": "ChIJpTcgYOidaDQRVHUO3ILkXJs",
               "startTime": "2019-01-02 16:00:00",
               "endTime": "2019-01-02 18:00:00"
             }
@@ -47,12 +51,14 @@
             {
               "name": "東部海岸國家風景區三仙台遊客中心",
               "cost": 0,
+              "placeId": "ChIJwx8IS0ZwbzQRgoFe8aDAFx0",
               "startTime": "2019-01-03 10:00:00",
               "endTime": "2019-01-03 12:00:00"
             },
             {
               "name": "知本溫泉",
               "cost": 400,
+              "placeId": "ChIJ7yDuP97JbzQRr_mzjOYs7tc",
               "startTime": "2019-01-03 15:00:00",
               "endTime": "2019-01-03 17:00:00"
             }
@@ -95,18 +101,21 @@
             {
               "name": "陽明山國家公園",
               "cost": 300,
+              "placeId": "ChIJS8fPJPitQjQRebDDT6PjC1w",
               "startTime": "2019-05-05 10:30:00",
               "endTime": "2019-05-05 14:00:00"
             },
             {
               "name": "淡水老街",
               "cost": 300,
+              "placeId": "ChIJOboJaVqlQjQRxwuIT4kvkKQ",
               "startTime": "2019-05-05 15:30:00",
               "endTime": "2019-05-05 17:30:00"
             },
             {
               "name": "華山1914文化創意產業園區",
               "cost": 0,
+              "placeId": "ChIJbSTgI2WpQjQRcVwWB2cnyfE",
               "startTime": "2019-05-05 19:00:00",
               "endTime": "2019-05-05 20:00:00"
             }
@@ -118,24 +127,28 @@
             {
               "name": "野柳地質公園",
               "cost": 80,
+              "placeId": "ChIJ1ZrmCnZMXTQRV2jCWjAX0eQ",
               "startTime": "2019-05-06 10:30:00",
               "endTime": "2019-05-06 12:00:00"
             },
             {
               "name": "九份老街",
               "cost": 300,
+              "placeId": "ChIJcZT7-hdFXTQR0qekplqCFV8",
               "startTime": "2019-05-05 14:00:00",
               "endTime": "2019-05-05 15:30:00"
             },
             {
               "name": "黃金博物館",
               "cost": 80,
+              "placeId": "ChIJ9653Kh5FXTQR1VWNys_RefA",
               "startTime": "2019-05-05 16:00:00",
               "endTime": "2019-05-05 17:00:00"
             },
             {
               "name": "基隆廟口夜市",
               "cost": 300,
+              "placeId": "hIJY5adFT5OXTQRHkmS-RPdhB0",
               "startTime": "2019-05-05 18:30:00",
               "endTime": "2019-05-05 20:00:00"
             }
@@ -147,12 +160,14 @@
             {
               "name": "臺北市立動物園",
               "cost": 60,
+              "placeId": "ChIJj4EySmCqQjQRZte0Cf0G_qo",
               "startTime": "2019-05-07 10:00:00",
               "endTime": "2019-05-07 16:00:00"
             },
             {
               "name": "西門町",
               "cost": 300,
+              "placeId": "ChIJFymoKgqpQjQRHVfkqP0tyww",
               "startTime": "2019-05-07 18:00:00",
               "endTime": "2019-05-07 20:00:00"
             }
@@ -197,30 +212,35 @@
             {
               "name": "安平古堡",
               "cost": 50,
+              "placeId": "ChIJZ-TjeHN2bjQR8a3Jat0VHps",
               "startTime": "2019-07-20 10:00:00",
               "endTime": "2019-07-20 11:00:00"
             },
             {
               "name": "安平老街",
               "cost": 300,
+              "placeId": "ChIJ_____wN2bjQRIOio8uGV_Og",
               "startTime": "2019-07-20 11:30:00",
               "endTime": "2019-07-20 13:30:00"
             },
             {
               "name": "安平樹屋",
               "cost": 50,
+              "placeId": "ChIJlynOByF3bjQR_IzNSlgH-Ss",
               "startTime": "2019-07-20 14:00:00",
               "endTime": "2019-07-20 14:40:00"
             },
             {
               "name": "四草綠色隧道",
               "cost": 200,
+              "placeId": "ChIJt0-ISOvYbTQRhg3rUteyQIw",
               "startTime": "2019-07-20 15:30:00",
               "endTime": "2019-07-20 17:00:00"
             },
             {
               "name": "神農街",
               "cost": 200,
+              "placeId": "ChIJqctagGZ2bjQRGlAjSFrC5hE",
               "startTime": "2019-07-20 19:00:00",
               "endTime": "2019-07-20 20:00:00"
             }
@@ -232,18 +252,21 @@
             {
               "name": "關子嶺溫泉",
               "cost": 800,
+              "placeId": "ChIJSfNljJ2NbjQRKpPO1fEKKsk",
               "startTime": "2019-07-21 10:00:00",
               "endTime": "2019-07-21 15:00:00"
             },
             {
               "name": "黃金海岸",
               "cost": 0,
+              "placeId": "ChIJMTD9H3J1bjQRC0l1HyDH3rQ",
               "startTime": "2019-07-21 17:00:00",
               "endTime": "2019-07-21 18:30:00"
             },
             {
               "name": "花園夜市",
               "cost": 300,
+              "placeId": "ChIJx7B27Vl2bjQRXNQQFasKOKI",
               "startTime": "2019-07-21 19:00:00",
               "endTime": "2019-07-21 20:30:00"
             }
@@ -255,24 +278,28 @@
             {
               "name": "十鼓仁糖文創園區",
               "cost": 399,
+              "placeId": "ChIJA0P9eml0bjQRAFSV5Tjabuc",
               "startTime": "2019-07-22 10:00:00",
               "endTime": "2019-07-22 15:00:00"
             },
             {
               "name": "依蕾特布丁",
               "cost": 100,
+              "placeId": "ChIJ-TPuxxF2bjQRJrg5_GhHuuk",
               "startTime": "2019-07-22 16:00:00",
               "endTime": "2019-07-22 16:30:00"
             },
             {
               "name": "藍晒圖文創園區",
               "cost": 0,
+              "placeId": "ChIJtbdB0Xt2bjQR1IE4qcWD-lg",
               "startTime": "2019-07-22 17:00:00",
               "endTime": "2019-07-22 17:40:00"
             },
             {
               "name": "林百貨",
               "cost": 200,
+              "placeId": "ChIJrZJc4GJ2bjQRa3BRyIgtRcM",
               "startTime": "2019-07-21 18:00:00",
               "endTime": "2019-07-21 18:40:00"
             }
@@ -284,6 +311,7 @@
             {
               "name": "奇美博物館",
               "cost": 200,
+              "placeId": "ChIJq6qqqnp0bjQRpvTHZeYTjKg",
               "startTime": "2019-07-23 10:00:00",
               "endTime": "2019-07-23 14:00:00"
             }
@@ -330,6 +358,7 @@
             {
               "name": "湯圍溝溫泉公園",
               "cost": 0,
+              "placeId": "ChIJ772ubUr6ZzQRuY_2y4RvRrM",
               "startTime": "2019-04-10 11:00:00",
               "endTime": "2019-04-10 12:00:00"
             },
@@ -342,12 +371,14 @@
             {
               "name": "羅東運動公園 東丘 落羽松",
               "cost": 0,
+              "placeId": "ChIJR_I4YILmZzQRmijPLPyNOug",
               "startTime": "2019-04-10 15:00:00",
               "endTime": "2019-07-20 17:00:00"
             },
             {
               "name": "羅東夜市",
               "cost": 300,
+              "placeId": "ChIJrw3A9X3mZzQRa6_ZjGQS3Sk",
               "startTime": "2019-04-10 19:30:00",
               "endTime": "2019-04-10 21:00:00"
             }
@@ -359,18 +390,21 @@
             {
               "name": "梅花湖",
               "cost": 300,
+              "placeId": "ChIJ7RubbibnZzQRA8A3eSqKblM",
               "startTime": "2019-04-11 11:00:00",
               "endTime": "2019-04-11 13:00:00"
             },
             {
               "name": "冬山河親水公園",
               "cost": 0,
+              "placeId": "ChIJ7RubbibnZzQRA8A3eSqKblM",
               "startTime": "2019-04-11 15:00:00",
               "endTime": "2019-04-11 15:30:00"
             },
             {
               "name": "東門夜市",
               "cost": 200,
+              "placeId": "ChIJ2WCYo-zkZzQRB9EeK1RWmBs",
               "startTime": "2019-04-11 16:30:00",
               "endTime": "2019-04-11 18:00:00"
             }
@@ -423,12 +457,14 @@
             {
               "name": "武陵農場",
               "cost": 300,
+              "placeId": "ChIJw2g-MZ_xaDQRiTnTz7upGWg",
               "startTime": "2019-10-10 10:00:00",
               "endTime": "2019-10-10 17:00:00"
             },
             {
               "name": "逢甲夜市",
               "cost": 300,
+              "placeId": "ChIJK4W2WSIWaTQROebP2ugIGg8",
               "startTime": "2019-10-10 18:00:00",
               "endTime": "2019-10-10 19:00:00"
             }
@@ -440,18 +476,21 @@
             {
               "name": "國立自然科學博物館",
               "cost": 300,
+              "placeId": "ChIJyzSRBng9aTQRNk-Xj7pbpvc",
               "startTime": "2019-10-11 10:00:00",
               "endTime": "2019-10-11 13:00:00"
             },
             {
               "name": "國立台灣美術館",
               "cost": 0,
+              "placeId": "ChIJyVHkNqY9aTQRDilsyqDVfbg",
               "startTime": "2019-10-11 15:00:00",
               "endTime": "2019-10-11 16:30:00"
             },
            {
               "name": "高美濕地",
               "cost": 0,
+              "placeId": "ChIJQ2FsFjwTaTQRKb4VYUrXd4Y",
               "startTime": "2019-10-10 17:20:00",
               "endTime": "2019-10-10 18:00:00"
            }
@@ -461,11 +500,11 @@
       ],
       "sites": [
         [
-          "國立自然科學博物館",
+          "武陵農場",
           "逢甲夜市"
         ],
         [
-          "台中市立美術館",
+          "國立自然科學博物館",
           "國立台灣美術館",
           "高美濕地"
         ]

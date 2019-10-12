@@ -1,5 +1,6 @@
 const Trip = require('../models/trip')
 const User = require('../models/user')
+const Site = require('../models/site')
 const MongoClient = require('mongodb').MongoClient
 const dbpath = process.env.MONGODB_URI || 'mongodb://localhost'
 const imgur = require('imgur')
@@ -48,6 +49,14 @@ const tripController = {
       data = { ...trip._doc } // 原本的 trip 為 strict mode，不可刪除或添加屬性，必須建立一個新的 object
       data.username = trip.userId.username
       data.userId = trip.userId._id
+      for (let content of data.contents) {
+        for (let activity of content.activities) {
+          if (activity.placeId) {
+            const site = await Site.findOne({ placeId: activity.placeId })
+            activity.collectingCounts = site.collectingCounts
+          }
+        }
+      }
       res.status(200).send(data)
     } catch (error) {
       console.log(error)
@@ -130,8 +139,8 @@ const tripController = {
     const body = JSON.parse(JSON.stringify(req.body))
     const files = req.files
     const data = JSON.parse(body.data)
-    if (!data.name || !data.sites || data.sites.length === 0) {
-      res.status(400).send('請輸入行程名稱及景點！')
+    if (!data.name) {
+      res.status(400).send('請輸入行程名稱！')
       return
     }
     // 整理 data 格式 (Postman 才需要，axios 不用)
@@ -159,7 +168,7 @@ const tripController = {
     try {
       const trip = await Trip.create({
         userId: req.user._id,
-        days: data.sites.length,
+        days: data.contents.length,
         ...data,
         images: imgLinks,
         startDate: data.startDate ? new Date(data.startDate) : new Date()
@@ -216,7 +225,7 @@ const tripController = {
         delete data[field]
       }
       Object.assign(trip, data)
-      trip.days = trip.sites.length
+      trip.days = trip.contents.length
       // 刪除舊圖片
       if (deletedImages.length !== 0) {
         deletedImages.forEach(image => {
