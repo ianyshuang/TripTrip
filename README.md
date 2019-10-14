@@ -14,9 +14,22 @@ TripTrip 是一個讓你能輕鬆、快速規劃行程的工具。
 ![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)[](https://github.com/feross/standard)
 
 ## Complete
-
+所有於專案繳交中第三點所列的 User Story
 
 ## In Progress
+
+#### 身為一個登入的使用者，我可以
+* 新增至多一個行程(儲存在 LocalStorage)
+
+#### 身為一個登入的使用者，我可以
+* 將自己的行程列印下來
+* 將自己的行程透過 email 分享給別人
+* 點選忘記密碼來重設自己的密碼
+* 開啟共同行程來邀請其他使用者一同編輯行程(非即時)
+
+#### 身為一個網站管理者，我可以
+* 看到所有行程的統計資料(未定)
+* 刪除任一行程的資料
 
 ## Installation
 
