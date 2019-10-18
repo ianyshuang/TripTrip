@@ -245,8 +245,8 @@ const tripController = {
       trip.markModified('contents')
       trip.markModified('sites')
       trip.markModified('comments')
-      trip.save()
-      res.status(200).end()
+      await trip.save()
+      res.status(200).send(trip)
     } catch (error) {
       console.log(error)
       res.status(500).end()
