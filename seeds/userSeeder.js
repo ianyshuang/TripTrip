@@ -4,7 +4,7 @@ const userData = require('../data/user.json')
 const bcrypt = require('bcrypt')
 const dbpath = process.env.MONGODB_URI || 'mongodb://localhost/trip-planer'
 
-mongoose.connect(dbpath, { useNewUrlParser: true })
+mongoose.connect(dbpath, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const db = mongoose.connection
 db.on('error', () => {

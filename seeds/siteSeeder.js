@@ -3,7 +3,7 @@ const Site = require('../models/site')
 const siteData = require('../data/site.json')['data']
 const dbpath = process.env.MONGODB_URI || 'mongodb://localhost/trip-planer'
 
-mongoose.connect(dbpath, { useNewUrlParser: true })
+mongoose.connect(dbpath, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const db = mongoose.connection
 db.on('error', () => {

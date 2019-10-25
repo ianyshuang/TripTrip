@@ -1,0 +1,15 @@
+runtime: nodejs10
+
+env_variables:
+  JWT_SECRET: "triptrip"
+  MAIL_USER: "triptrip.officialmail@gmail.com"
+  MAIL_PASSWORD: "triptrip2019"
+  FACEBOOK_ID: "664387430757824"
+  FACEBOOK_SECRET: "7ec87bbd6a94d2ee7f5e6fbb031ed9e7"
+  GOOGLE_ID: "629240843777-tguc1ovi0qogifr28smevh40tveb3srj.apps.googleusercontent.com"
+  GOOGLE_SECRET: "i_7X5-d6S4X2MFoFlz0iKklY"
+  IMGUR_ID: "0e62f18b249c6cd"
+  IMGUR_SECRET: "fe4be0222293e8847dd15d422a7acf5fdf69c715"
+  PLACE_API_KEY: "AIzaSyDh5WZBxwE5PewnqjNC0rgZ3I8Hxpm9r4Q"
+  BASE_URL: "https://triptrip-251211.appspot.com"
+  MONGODB_URI: "mongodb+srv://ianyshuang:ian88781115@triptrip-kwuux.gcp.mongodb.net/test?retryWrites=true&w=majority"
