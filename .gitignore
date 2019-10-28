@@ -3,3 +3,4 @@ node_modules/
 /.env
 data/place.js
 data/photo.js
+app.yaml

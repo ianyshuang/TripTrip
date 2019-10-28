@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Trip = require('../models/trip')
 const Site = require('../models/site')
-const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 const imgur = require('imgur')
 
@@ -20,7 +20,7 @@ const userController = {
       } else {
         const newUser = await User.create({
           email,
-          password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
+          password: crypto.createHash('md5').update(password, 'utf-8').digest('hex'),
           username
         })
         delete newUser.password
@@ -107,9 +107,6 @@ const userController = {
     try {
       const user = await User.findById(req.user._id)
       user.username = username || user.username
-      user.password = password
-        ? bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
-        : user.password
       user.introduction = introduction || user.introduction
       user.avatar = file ? imgurObject.data.link : user.avatar
       user.save()
@@ -183,7 +180,7 @@ const userController = {
         res.status(404).end()
         return
       } else {
-        user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
+        user.password = crypto.createHash('md5').update(password, 'utf-8').digest('hex')
         user.save()
         res.status(200).end()
       }

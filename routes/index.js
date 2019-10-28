@@ -4,7 +4,9 @@ const userController = require('../controllers/userController')
 const passport = require('passport')
 const issueToken = require('../utils/issue_token')
 
-
+router.get('/', (req, res) => {
+  res.send({ message: 'This is the api server of triptrip'})
+})
 router.post('/signin', passport.authenticate('local', { session: false }), issueToken, userController.getUser)
 router.post('/signup', userController.signup)
 router.post('/logout', passport.authenticate('jwt', { session: false }), userController.deleteToken)

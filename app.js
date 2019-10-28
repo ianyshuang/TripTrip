@@ -1,6 +1,7 @@
 // 載入套件及初始設定
 const express = require('express')
 const app = express()
+const serverless = require('serverless-http')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -12,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const passport = require('./config/passport')
 // 跟 mongodb 連線
-mongoose.connect(dbpath, { useNewUrlParser: true, useCreateIndex: true , useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://ianyshuang:ian88781115@triptrip-kwuux.gcp.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true , useUnifiedTopology: true })
 const db = mongoose.connection
 
 // 使用設定
@@ -20,7 +21,8 @@ const corsOptions = {
   origin: [
     'http://localhost:8080',
     'http://localhost:3000',
-    'https://triptrip-backend.herokuapp.com'
+    'https://triptrip-backend.herokuapp.com',
+    'http://triptrip.s3-website-ap-northeast-1.amazonaws.com'
   ],
   credentials: true,
   maxAge: 1728000
@@ -44,3 +46,5 @@ app.use('/', require('./routes'))
 app.listen(port, () => {
   console.log(`Server is now running on http://localhost:${port}`)
 })
+
+module.exports.handler = serverless(app)

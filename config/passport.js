@@ -1,7 +1,7 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const User = require('../models/user')
-const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 const JwtStrategy = require('passport-jwt').Strategy
 const FacebookStrategy = require('passport-facebook').Strategy
 const GoogleStrategy = require('passport-google-oauth20').Strategy
@@ -14,7 +14,8 @@ passport.use(
         if (!user) {
           return done(null, false, 404)
         } else {
-          if (!bcrypt.compareSync(password, user.password)) return done(null, false, 422)
+          const hash = crypto.createHash('md5').update(password, 'utf8').digest('hex')
+          if (user.password !== hash) return done(null, false, 422)
           return done(null, user)
         }
     } catch (error) {
@@ -65,17 +66,11 @@ passport.use(
             return done(null, user)
           }
         } else {
-          var randomPassword = Math.random()
-            .toString(36)
-            .slice(-8)
+          var randomPassword = Math.random().toString(36).slice(-8)
           const newUser = await User.create({
             username: profile.displayName || ' ',
             email: profile._json.email,
-            password: bcrypt.hashSync(
-              randomPassword,
-              bcrypt.genSaltSync(10),
-              null
-            ),
+            password: crypto.createHash('md5').update(randomPassword, 'utf-8').digest('hex'),
             avatar: profile.photos[0].value || process.env.BASE_URL + '/img/user.png',
             accountType: 'facebook'
           })
@@ -112,11 +107,7 @@ passport.use(
           const newUser = await User.create({
             username: profile.displayName || ' ',
             email: profile._json.email,
-            password: bcrypt.hashSync(
-              randomPassword,
-              bcrypt.genSaltSync(10),
-              null
-            ),
+            password: crypto.createHash('md5').update(randomPassword, 'utf-8').digest('hex'),
             avatar: profile._json.picture || process.env.BASE_URL + '/img/user.png',
             accountType: 'google'
           })

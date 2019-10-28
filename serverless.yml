@@ -1,0 +1,15 @@
+service: triptrip-api
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: ap-northeast-1
+  memorySize: 512
+functions:
+  triptrip:
+    handler: app.handler
+    events: 
+      - http: 
+          path: /
+          method: GET
+          cors: true

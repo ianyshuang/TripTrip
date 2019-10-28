@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const User = require('../models/user')
 const readline = require('readline')
-const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 const dbpath = process.env.MONGODB_URI || 'mongodb://localhost/trip-planer'
 
 mongoose.connect(dbpath, { useNewUrlParser: true })
@@ -32,7 +32,7 @@ db.once('open', () => {
     User.create({
       username: username,
       email: email,
-      password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
+      password: crypto.createHash('md5').update(password, 'utf-8').digest('hex'),
       isAdmin: true
     }).then(() => {
       console.log('succefully create admin user!')
