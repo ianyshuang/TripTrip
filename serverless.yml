@@ -9,7 +9,5 @@ functions:
   triptrip:
     handler: app.handler
     events: 
-      - http: 
-          path: /
-          method: GET
-          cors: true
+      - http: ANY /
+      - http: 'ANY {proxy+}'

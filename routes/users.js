@@ -3,7 +3,7 @@ const router = express.Router()
 const userController = require('../controllers/userController')
 const passport = require('../config/passport')
 const multer = require('multer')
-const upload = multer({ dest: 'temp/' })
+const upload = multer({ dest: '/tmp/' })
 
 const authenticated = passport.authenticate('jwt', { session: false })
 const authenticateForgot = require('../utils/verify_token')

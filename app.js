@@ -43,4 +43,8 @@ db.once('open', () => {
 
 app.use('/', require('./routes'))
 
+// app.listen(port, () => {
+//   console.log('App is now listening on port' + port)
+// })
+
 module.exports.handler = serverless(app)
