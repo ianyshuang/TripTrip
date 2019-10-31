@@ -14,7 +14,7 @@ passport.use(
         if (!user) {
           return done(null, false, 404)
         } else {
-          const hash = crypto.createHash('md5').update(password, 'utf8').digest('hex')
+          const hash = crypto.createHash('md5').update(password, 'utf-8').digest('hex')
           if (user.password !== hash) return done(null, false, 422)
           return done(null, user)
         }
